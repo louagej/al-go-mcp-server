@@ -18,7 +18,7 @@ A Model Context Protocol (MCP) server that provides access to AL-Go documentatio
 
 ## Installation
 
-### From npm (Recommended)
+### With npm
 
 ```bash
 # Install globally for command line usage
@@ -28,31 +28,37 @@ npm install -g al-go-mcp-server
 npx al-go-mcp-server
 ```
 
-### From Source
-
-```bash
-git clone https://github.com/louagej/al-go-mcp-server.git
-cd al-go-mcp-server
-npm install
-npm run build
-npm start
-```
 
 ## Usage
 
-### Command Line
+### VS Code with MCP Extension (Recommended)
 
-```bash
-# If installed globally
-al-go-mcp-server
+You can configure the AL-Go MCP server in two ways:
 
-# Or using npx (no installation needed)
-npx al-go-mcp-server
+#### Option 1: User Settings (Recommended)
+Add to your **User MCP Configuration** for access across all projects in the same VS Code profile:
+
+> **Note**: User settings are profile-specific. The server will be available for all projects opened with the same VS Code profile (e.g., "Node.js", "Default", etc.).
+
+1. Open VS Code Command Palette (`Ctrl+Shift+P`)
+2. Run **"MCP: Open User Configuration"**
+3. Add the server configuration:
+
+```json
+{
+  "servers": {
+    "al-go-docs": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["al-go-mcp-server"]
+    }
+  },
+  "inputs": []
+}
 ```
 
-### VS Code with MCP Extension
-
-Add to your VS Code MCP settings (`.vscode/mcp.json`):
+#### Option 2: Project Settings
+Add to your project's `.vscode/mcp.json` for project-specific configuration:
 
 ```json
 {
@@ -68,8 +74,26 @@ Add to your VS Code MCP settings (`.vscode/mcp.json`):
 
 ### With GitHub Authentication (Optional)
 
-For higher rate limits and better performance, provide a GitHub token:
+For higher rate limits and better performance, provide a GitHub token. This can be added to either user or project settings:
 
+**User Settings** (add `env` to the server configuration):
+```json
+{
+  "servers": {
+    "al-go-docs": {
+      "type": "stdio",
+      "command": "npx", 
+      "args": ["al-go-mcp-server"],
+      "env": {
+        "GITHUB_TOKEN": "your_github_token_here"
+      }
+    }
+  },
+  "inputs": []
+}
+```
+
+**Project Settings** (`.vscode/mcp.json`):
 ```json
 {
   "servers": {
@@ -85,6 +109,17 @@ For higher rate limits and better performance, provide a GitHub token:
 }
 ```
 
+### Command Line (Advandced)
+
+```bash
+# If installed globally
+al-go-mcp-server
+
+# Or using npx (no installation needed)
+npx al-go-mcp-server
+```
+
+
 ## Available Tools
 
 When connected, the server provides these tools:
@@ -92,8 +127,6 @@ When connected, the server provides these tools:
 - **`search-al-go-docs`**: Search through AL-Go documentation with queries
 - **`get-al-go-workflows`**: Get examples of AL-Go GitHub workflows  
 - **`refresh-al-go-cache`**: Refresh cached documentation (force update)
-
-## Development
 
 ## Development
 
