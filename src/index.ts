@@ -5,6 +5,46 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { AlGoService } from "./services/AlGoService.js";
 import { DocumentIndex } from "./services/DocumentIndex.js";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Handle command line arguments
+const args = process.argv.slice(2);
+if (args.includes('--version') || args.includes('-v')) {
+  // Read version from package.json
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const packageJsonPath = path.join(__dirname, '..', 'package.json');
+  
+  try {
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    console.log(`al-go-mcp-server v${packageJson.version}`);
+    process.exit(0);
+  } catch (error) {
+    console.log('al-go-mcp-server (version unknown)');
+    process.exit(0);
+  }
+}
+
+if (args.includes('--help') || args.includes('-h')) {
+  console.log(`
+AL-Go MCP Server
+
+A Model Context Protocol server for accessing AL-Go documentation.
+
+Usage:
+  npx al-go-mcp-server              Start the MCP server
+  npx al-go-mcp-server --version    Show version information
+  npx al-go-mcp-server --help       Show this help message
+
+Environment Variables:
+  GITHUB_TOKEN                      Optional GitHub token for higher rate limits
+
+For more information, visit: https://github.com/louagej/al-go-mcp-server
+`);
+  process.exit(0);
+}
 
 /**
  * AL-Go Documentation MCP Server
@@ -17,7 +57,7 @@ import { DocumentIndex } from "./services/DocumentIndex.js";
 // Initialize the MCP server
 const server = new McpServer({
   name: "al-go-mcp-server",
-  version: "1.0.0"
+  version: "1.0.1"
 });
 
 // Initialize services
