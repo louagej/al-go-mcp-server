@@ -1,0 +1,120 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+      changelog_entry:
+        description: 'Changelog entry (brief description of changes)'
+        required: true
+        type: string
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+      - name: Get current version
+        id: current_version
+        run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+        
+      - name: Bump version
+        id: version_bump
+        run: |
+          NEW_VERSION=$(npm version ${{ github.event.inputs.version_type }} --no-git-tag-version)
+          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_OUTPUT
+          echo "Bumped from ${{ steps.current_version.outputs.VERSION }} to ${NEW_VERSION}"
+          
+      - name: Update changelog
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          NEW_VERSION="${{ steps.version_bump.outputs.NEW_VERSION }}"
+          CHANGELOG_ENTRY="${{ github.event.inputs.changelog_entry }}"
+          
+          # Create temporary file with new entry
+          cat > temp_changelog.md << EOF
+          # Changelog
+          
+          All notable changes to this project will be documented in this file.
+          
+          The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+          and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+          
+          ## [${NEW_VERSION#v}] - ${DATE}
+          
+          ### Changed
+          - ${CHANGELOG_ENTRY}
+          
+          EOF
+          
+          # Append rest of changelog (skip header)
+          tail -n +8 CHANGELOG.md >> temp_changelog.md
+          mv temp_changelog.md CHANGELOG.md
+          
+      - name: Commit version bump and changelog
+        run: |
+          git add package.json CHANGELOG.md
+          git commit -m "chore: bump version to ${{ steps.version_bump.outputs.NEW_VERSION }} and update changelog"
+          
+      - name: Create and push tag
+        run: |
+          git tag ${{ steps.version_bump.outputs.NEW_VERSION }}
+          git push origin main
+          git push origin ${{ steps.version_bump.outputs.NEW_VERSION }}
+          
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version_bump.outputs.NEW_VERSION }}
+          release_name: Release ${{ steps.version_bump.outputs.NEW_VERSION }}
+          body: |
+            ## Changes in ${{ steps.version_bump.outputs.NEW_VERSION }}
+            
+            ${{ github.event.inputs.changelog_entry }}
+            
+            See [CHANGELOG.md](CHANGELOG.md) for full details.
+            
+            ## Installation
+            
+            ```bash
+            npx al-go-mcp-server
+            ```
+            
+            Or install globally:
+            
+            ```bash
+            npm install -g al-go-mcp-server@${{ steps.version_bump.outputs.NEW_VERSION }}
+            ```
+          draft: false
+          prerelease: false
