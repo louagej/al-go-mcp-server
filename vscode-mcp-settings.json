@@ -1,0 +1,11 @@
+{
+  "github.copilot.chat.mcp.servers": {
+    "al-go-docs": {
+      "command": "node",
+      "args": ["c:\\Users\\Job.Louage\\AL\\mcp\\build\\index.js"],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  }
+}

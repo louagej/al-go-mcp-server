@@ -1,0 +1,38 @@
+{
+  "name": "al-go-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for AL-Go documentation integration",
+  "type": "module",
+  "main": "./build/index.js",
+  "bin": {
+    "al-go-mcp-server": "./build/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "dev": "tsc && node build/index.js",
+    "watch": "tsc --watch"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "al-go",
+    "documentation",
+    "github"
+  ],
+  "author": "Job Louage",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.18.0",
+    "@octokit/rest": "^21.0.2",
+    "zod": "^3.23.8",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.6.0"
+  },
+  "files": [
+    "build"
+  ]
+}
