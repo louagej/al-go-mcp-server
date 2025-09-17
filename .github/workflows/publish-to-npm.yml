@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*.*.*'  # Triggers on version tags created by create-release workflow
+  workflow_dispatch:  # Allow manual triggering
 
 jobs:
   publish:
