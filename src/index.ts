@@ -60,9 +60,23 @@ const server = new McpServer({
   version: "1.0.1"
 });
 
-// Initialize services
-const alGoService = new AlGoService();
-const documentIndex = new DocumentIndex();
+// Initialize services lazily to avoid startup messages for --version/--help
+let alGoService: AlGoService;
+let documentIndex: DocumentIndex;
+
+function getAlGoService(): AlGoService {
+  if (!alGoService) {
+    alGoService = new AlGoService();
+  }
+  return alGoService;
+}
+
+function getDocumentIndex(): DocumentIndex {
+  if (!documentIndex) {
+    documentIndex = new DocumentIndex();
+  }
+  return documentIndex;
+}
 
 // Resource: Get AL-Go repository information
 server.registerResource(
@@ -74,7 +88,7 @@ server.registerResource(
     mimeType: "application/json"
   },
   async (uri) => {
-    const repoInfo = await alGoService.getRepositoryInfo();
+    const repoInfo = await getAlGoService().getRepositoryInfo();
     return {
       contents: [{
         uri: uri.href,
@@ -96,7 +110,7 @@ server.registerResource(
   async (uri) => {
     // Extract path from URI
     const urlPath = new URL(uri.href).pathname.replace('/docs/', '');
-    const content = await alGoService.getDocumentContent(urlPath);
+    const content = await getAlGoService().getDocumentContent(urlPath);
     return {
       contents: [{
         uri: uri.href,
@@ -121,7 +135,7 @@ server.registerTool(
   async ({ query, limit }) => {
     try {
       // Use direct API search instead of indexing
-      const results = await documentIndex.search(query, limit);
+      const results = await getDocumentIndex().search(query, limit);
       
       const resultText = results.map((result: any, index: number) => 
         `${index + 1}. **${result.title}** (${result.path})\n   ${result.excerpt}\n   Score: ${result.score.toFixed(2)}\n`
@@ -157,7 +171,7 @@ server.registerTool(
   },
   async ({ workflowType }) => {
     try {
-      const workflows = await alGoService.getWorkflowExamples(workflowType);
+      const workflows = await getAlGoService().getWorkflowExamples(workflowType);
       
       const workflowText = workflows.map((workflow: any) => 
         `## ${workflow.name}\n**Path:** ${workflow.path}\n**Description:** ${workflow.description}\n\n\`\`\`yaml\n${workflow.content}\n\`\`\`\n`
@@ -193,7 +207,7 @@ server.registerTool(
   },
   async ({ force }) => {
     try {
-      await documentIndex.refresh(alGoService, force);
+      await getDocumentIndex().refresh(getAlGoService(), force);
       return {
         content: [{
           type: "text",
