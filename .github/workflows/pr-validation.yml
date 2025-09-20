@@ -16,7 +16,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           # Only checkout the PR head, not merge commit
           ref: ${{ github.event.pull_request.head.sha }}
@@ -44,10 +44,43 @@ jobs:
         
       - name: Check for secrets in code
         run: |
-          # Simple check for potential secrets
-          if grep -r -i "api[_-]key\|secret\|password\|token" src/ --exclude-dir=node_modules --exclude="*.md" --exclude="*.json"; then
-            echo "Potential secrets found in code!"
+          # Check for potential hardcoded secrets (excluding legitimate env var usage)
+          echo "Checking for potential hardcoded secrets..."
+          
+          # Check for actual secret values (patterns that look like real secrets)
+          SECRET_PATTERNS=(
+            "['\"][a-zA-Z0-9]{20,}['\"]"  # Quoted strings that look like tokens
+            "sk-[a-zA-Z0-9]{20,}"         # OpenAI API keys
+            "ghp_[a-zA-Z0-9]{36}"         # GitHub personal access tokens
+            "gho_[a-zA-Z0-9]{36}"         # GitHub OAuth tokens
+            "ghu_[a-zA-Z0-9]{36}"         # GitHub user tokens
+            "ghs_[a-zA-Z0-9]{36}"         # GitHub server tokens
+            "glpat-[a-zA-Z0-9_-]{20,}"    # GitLab personal access tokens
+            "xoxb-[a-zA-Z0-9-]+"          # Slack bot tokens
+            "xoxa-[a-zA-Z0-9-]+"          # Slack app tokens
+          )
+          
+          FOUND_SECRETS=false
+          
+          for pattern in "${SECRET_PATTERNS[@]}"; do
+            if grep -r -E "$pattern" src/ --exclude-dir=node_modules 2>/dev/null; then
+              echo "❌ Potential hardcoded secret found matching pattern: $pattern"
+              FOUND_SECRETS=true
+            fi
+          done
+          
+          # Check for suspicious hardcoded values (but allow env var references)
+          if grep -r "password.*=" src/ --exclude-dir=node_modules | grep -v "process.env" | grep -v "console.log\|console.error" 2>/dev/null; then
+            echo "❌ Potential hardcoded password found"
+            FOUND_SECRETS=true
+          fi
+          
+          if [ "$FOUND_SECRETS" = true ]; then
+            echo "🚨 Potential secrets detected in code!"
+            echo "Note: References to process.env.VARIABLE_NAME are OK"
             exit 1
+          else
+            echo "✅ No hardcoded secrets detected"
           fi
           
       - name: Validate package.json
@@ -73,7 +106,7 @@ jobs:
     
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0  # Need full history to check changed files
           
