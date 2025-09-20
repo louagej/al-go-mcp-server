@@ -1,0 +1,47 @@
+version: 2
+updates:
+  # Enable version updates for npm dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    # Group minor and patch updates together
+    groups:
+      production-dependencies:
+        patterns:
+          - "@modelcontextprotocol/*"
+          - "@octokit/*"
+          - "zod"
+          - "node-fetch"
+      development-dependencies:
+        patterns:
+          - "@types/*"
+          - "typescript"
+        update-types:
+          - "minor"
+          - "patch"
+    # Limit number of open PRs
+    open-pull-requests-limit: 5
+    # Add labels for easy identification
+    labels:
+      - "dependencies"
+      - "security"
+    # Commit message format
+    commit-message:
+      prefix: "chore(deps)"
+      include: "scope"
+
+  # Enable version updates for GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    labels:
+      - "github-actions"
+      - "security"
+    commit-message:
+      prefix: "chore(actions)"

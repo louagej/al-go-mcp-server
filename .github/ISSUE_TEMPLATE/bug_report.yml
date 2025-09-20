@@ -1,0 +1,76 @@
+name: Bug Report
+description: Report a bug or issue with AL-Go MCP Server
+title: "[Bug]: "
+labels: ["bug", "needs-triage"]
+assignees:
+  - louagej
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug! Please fill out this form to help us understand and fix the issue.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+      placeholder: Describe what went wrong...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Steps to reproduce the behavior
+      placeholder: |
+        1. Run the server with...
+        2. Send the following request...
+        3. Expected result vs actual result...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: Describe the expected behavior...
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Please provide details about your environment
+      placeholder: |
+        - OS: [e.g., Windows 11, macOS 14, Ubuntu 22.04]
+        - Node.js version: [e.g., 20.10.0]
+        - npm version: [e.g., 10.2.3]
+        - AL-Go MCP Server version: [e.g., 1.0.6]
+        - VS Code version (if applicable): [e.g., 1.85.0]
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs
+      description: Please paste any relevant log output or error messages
+      render: shell
+      placeholder: Paste logs here...
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Checklist
+      options:
+        - label: I have searched existing issues to make sure this is not a duplicate
+          required: true
+        - label: I have provided all the requested information
+          required: true
+        - label: I am using the latest version of AL-Go MCP Server
+          required: false

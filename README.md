@@ -149,7 +149,41 @@ npx tsx src/index.ts
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+We welcome contributions from the community! This project is open source and we appreciate all kinds of contributions.
+
+### 🚀 Quick Start for Contributors
+
+1. **Fork the repository** and clone it locally
+2. **Install dependencies**: `npm install`
+3. **Build the project**: `npm run build`
+4. **Make your changes** following our [contribution guidelines](CONTRIBUTING.md)
+5. **Submit a pull request** with a clear description
+
+### 📋 Contribution Guidelines
+
+Please read our [CONTRIBUTING.md](CONTRIBUTING.md) for detailed information about:
+
+- Development setup and workflow
+- Code style and standards
+- Pull request process
+- Security guidelines
+- Review process
+
+### 🔒 Security
+
+For security-related issues, please review our [Security Policy](SECURITY.md) and report vulnerabilities responsibly.
+
+### 🐛 Issues and Feature Requests
+
+- **Bug Reports**: Use the issue template and provide detailed reproduction steps
+- **Feature Requests**: Describe the feature and its use case clearly
+- **Questions**: Use GitHub Discussions for general questions
+
+### 👥 Community
+
+- All contributors are expected to follow our code of conduct
+- Be respectful and constructive in all interactions
+- Help maintain a welcoming environment for everyone
 
 ## License
 
