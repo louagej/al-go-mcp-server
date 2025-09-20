@@ -22,6 +22,10 @@
   ],
   "author": "Job Louage",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/louagej/al-go-mcp-server.git"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.18.0",
     "@octokit/rest": "^21.0.2",
