@@ -58,14 +58,39 @@ export class DocumentIndex {
    * Search through the indexed documents
    */
   async search(query: string, limit: number = 10): Promise<SearchResult[]> {
-    // Return a simple response to avoid API rate limits
-    return [{
-      title: "AL-Go Documentation Search",
-      path: "README.md", 
-      excerpt: `Search for "${query}" - Due to GitHub API rate limits, please use specific file paths with the al-go-doc resource or try the get-al-go-workflows tool.`,
-      score: 1.0,
-      content: "Use specific AL-Go documentation file paths or workflow tools for better results."
-    }];
+    if (!this.isInitialized || this.documents.length === 0) {
+      return [{
+        title: "No documents available",
+        path: "error",
+        excerpt: "Document index not initialized. Please try again in a moment.",
+        score: 0,
+        content: "The document index is still being loaded. Please wait a moment and try your search again."
+      }];
+    }
+
+    const lowerQuery = query.toLowerCase();
+    const results: SearchResult[] = [];
+
+    // Search through all documents
+    for (const doc of this.documents) {
+      const score = this.calculateRelevanceScore(doc, lowerQuery);
+      
+      if (score > 0) {
+        const excerpt = this.extractExcerpt(doc.content, lowerQuery);
+        
+        results.push({
+          title: doc.title,
+          path: doc.path,
+          excerpt: excerpt,
+          score: score,
+          content: doc.content.substring(0, 1000) // Limit content to avoid overwhelming responses
+        });
+      }
+    }
+
+    // Sort by relevance score (descending) and limit results
+    results.sort((a, b) => b.score - a.score);
+    return results.slice(0, limit);
   }
 
   /**
