@@ -12,13 +12,8 @@ import { fileURLToPath } from "url";
 // Handle command line arguments
 const args = process.argv.slice(2);
 if (args.includes('--version') || args.includes('-v')) {
-  // Read version from package.json
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  const packageJsonPath = path.join(__dirname, '..', 'package.json');
-  
   try {
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    const { packageJson } = getPackageVersion();
     console.log(`al-go-mcp-server v${packageJson.version}`);
     process.exit(0);
   } catch (error) {
@@ -54,35 +49,46 @@ For more information, visit: https://github.com/louagej/al-go-mcp-server
  * search capabilities for AL-Go specific queries.
  */
 
-// Read version from package.json
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const packageJsonPath = path.join(__dirname, '..', 'package.json');
-const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-
-// Initialize the MCP server
-const server = new McpServer({
-  name: "al-go-mcp-server",
-  version: packageJson.version
-});
-
-// Initialize services lazily to avoid startup messages for --version/--help
-let alGoService: AlGoService;
-let documentIndex: DocumentIndex;
-
-function getAlGoService(): AlGoService {
-  if (!alGoService) {
-    alGoService = new AlGoService();
-  }
-  return alGoService;
+// Function to get version from package.json
+function getPackageVersion(): { version: string; packageJson: any } {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const packageJsonPath = path.join(__dirname, '..', 'package.json');
+  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+  return { version: packageJson.version, packageJson };
 }
 
-function getDocumentIndex(): DocumentIndex {
-  if (!documentIndex) {
-    documentIndex = new DocumentIndex();
-  }
-  return documentIndex;
-}
+// Main function to start the server
+async function main() {
+  console.error("Starting AL-Go MCP Server...");
+  
+  try {
+    // Get package info
+    const { packageJson } = getPackageVersion();
+
+    // Initialize the MCP server
+    const server = new McpServer({
+      name: "al-go-mcp-server",
+      version: packageJson.version
+    });
+
+    // Initialize services lazily to avoid startup messages for --version/--help
+    let alGoService: AlGoService;
+    let documentIndex: DocumentIndex;
+
+    function getAlGoService(): AlGoService {
+      if (!alGoService) {
+        alGoService = new AlGoService();
+      }
+      return alGoService;
+    }
+
+    function getDocumentIndex(): DocumentIndex {
+      if (!documentIndex) {
+        documentIndex = new DocumentIndex();
+      }
+      return documentIndex;
+    }
 
 // Resource: Get server version information
 server.registerResource(
@@ -312,13 +318,6 @@ Use the AL-Go documentation and examples available through the MCP tools to prov
   }
 );
 
-// Main function to start the server
-async function main() {
-  console.error("Starting AL-Go MCP Server...");
-  
-  try {
-    // Document index will be initialized on first search request
-    
     // Start the server with stdio transport
     const transport = new StdioServerTransport();
     await server.connect(transport);

@@ -50,7 +50,7 @@ Add to your **User MCP Configuration** for access across all projects in the sam
     "al-go-docs": {
       "type": "stdio",
       "command": "npx",
-      "args": ["al-go-mcp-server"]
+      "args": ["--yes", "al-go-mcp-server@latest"]
     }
   },
   "inputs": []
@@ -66,7 +66,7 @@ Add to your project's `.vscode/mcp.json` for project-specific configuration:
     "al-go-docs": {
       "type": "stdio", 
       "command": "npx",
-      "args": ["al-go-mcp-server"]
+      "args": ["--yes", "al-go-mcp-server@latest"]
     }
   }
 }
@@ -83,7 +83,7 @@ For higher rate limits and better performance, provide a GitHub token. This can 
     "al-go-docs": {
       "type": "stdio",
       "command": "npx", 
-      "args": ["al-go-mcp-server"],
+      "args": ["--yes", "al-go-mcp-server@latest"],
       "env": {
         "GITHUB_TOKEN": "your_github_token_here"
       }
@@ -100,7 +100,7 @@ For higher rate limits and better performance, provide a GitHub token. This can 
     "al-go-docs": {
       "type": "stdio",
       "command": "npx", 
-      "args": ["al-go-mcp-server"],
+      "args": ["--yes", "al-go-mcp-server@latest"],
       "env": {
         "GITHUB_TOKEN": "your_github_token_here"
       }
@@ -115,8 +115,11 @@ For higher rate limits and better performance, provide a GitHub token. This can 
 # If installed globally
 al-go-mcp-server
 
-# Or using npx (no installation needed)
-npx al-go-mcp-server
+# Or using npx (no installation needed, always latest)
+npx --yes al-go-mcp-server@latest
+
+# Check version
+npx --yes al-go-mcp-server@latest --version
 ```
 
 
