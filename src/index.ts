@@ -323,7 +323,7 @@ async function main() {
     const transport = new StdioServerTransport();
     await server.connect(transport);
     
-    console.error("AL-Go MCP Server is running on stdio");
+    console.error(`AL-Go MCP Server v${packageJson.version} is running on stdio`);
   } catch (error) {
     console.error("Failed to start AL-Go MCP Server:", error);
     process.exit(1);
