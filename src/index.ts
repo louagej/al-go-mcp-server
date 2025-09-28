@@ -54,10 +54,16 @@ For more information, visit: https://github.com/louagej/al-go-mcp-server
  * search capabilities for AL-Go specific queries.
  */
 
+// Read version from package.json
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const packageJsonPath = path.join(__dirname, '..', 'package.json');
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+
 // Initialize the MCP server
 const server = new McpServer({
   name: "al-go-mcp-server",
-  version: "1.0.1"
+  version: packageJson.version
 });
 
 // Initialize services lazily to avoid startup messages for --version/--help
@@ -77,6 +83,31 @@ function getDocumentIndex(): DocumentIndex {
   }
   return documentIndex;
 }
+
+// Resource: Get server version information
+server.registerResource(
+  "server-version",
+  "al-go://server/version",
+  {
+    title: "AL-Go MCP Server Version",
+    description: "Version information for the AL-Go MCP server",
+    mimeType: "application/json"
+  },
+  async (uri) => {
+    return {
+      contents: [{
+        uri: uri.href,
+        text: JSON.stringify({
+          name: packageJson.name,
+          version: packageJson.version,
+          description: packageJson.description,
+          author: packageJson.author
+        }, null, 2),
+        mimeType: "application/json"
+      }]
+    };
+  }
+);
 
 // Resource: Get AL-Go repository information
 server.registerResource(
@@ -192,6 +223,24 @@ server.registerTool(
         isError: true
       };
     }
+  }
+);
+
+// Tool: Get server version
+server.registerTool(
+  "get-server-version",
+  {
+    title: "Get AL-Go MCP Server Version",
+    description: "Get version information for the AL-Go MCP server",
+    inputSchema: {}
+  },
+  async () => {
+    return {
+      content: [{
+        type: "text",
+        text: `AL-Go MCP Server v${packageJson.version}\n\nAuthor: ${packageJson.author}\nDescription: ${packageJson.description}\nRepository: ${packageJson.repository?.url || 'N/A'}`
+      }]
+    };
   }
 );
 
