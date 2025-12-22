@@ -10,10 +10,11 @@ export class AlGoService {
 
   constructor() {
     // Initialize Octokit with authentication
-    const githubToken = process.env.GITHUB_TOKEN;
+    const githubToken = process.env.GITHUB_TOKEN || process.env.AL_GO_MCP_GITHUB_TOKEN;
     const githubAppId = process.env.GITHUB_APP_ID;
     const githubPrivateKey = process.env.GITHUB_PRIVATE_KEY;
     const githubInstallationId = process.env.GITHUB_INSTALLATION_ID;
+    const userAgent = "al-go-mcp-server/1.0.0";
 
     if (githubAppId && githubPrivateKey && githubInstallationId) {
       // Use GitHub App authentication
@@ -21,17 +22,21 @@ export class AlGoService {
         appId: githubAppId,
         privateKey: githubPrivateKey.replace(/\\n/g, '\n'),
         installationId: githubInstallationId,
+        userAgent
       });
       console.log("AL-Go MCP Server: Using GitHub App authentication");
     } else if (githubToken) {
       // Fallback to personal token
       this.octokit = new Octokit({
-        auth: githubToken
+        auth: githubToken,
+        userAgent
       });
       console.log("AL-Go MCP Server: Using personal token authentication");
     } else {
       // No authentication
-      this.octokit = new Octokit();
+      this.octokit = new Octokit({
+        userAgent
+      });
       console.log("AL-Go MCP Server: Using unauthenticated requests (rate limited)");
     }
   }
