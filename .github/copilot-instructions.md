@@ -1,72 +1,71 @@
-<!-- Use this file to provide workspace-specific custom instructions to Copilot. For more details, visit https://code.visualstudio.com/docs/copilot/copilot-customization#_use-a-githubcopilotinstructionsmd-file -->
-- [x] Verify that the copilot-instructions.md file in the .github directory is created.
+# AL-Go MCP Server — Copilot Instructions
 
-- [ ] Clarify Project Requirements
-	<!-- Ask for project type, language, and frameworks if not specified. Skip if already provided. -->
+This workspace is the **AL-Go MCP Server** project. It provides MCP tools for AL-Go documentation, domain specialists, and knowledge sources.
 
-- [ ] Scaffold the Project
-	<!--
-	Ensure that the previous step has been marked as completed.
-	Call project setup tool with projectType parameter.
-	Run scaffolding command to create project files and folders.
-	Use '.' as the working directory.
-	If no appropriate projectType is available, search documentation using available tools.
-	Otherwise, create the project structure manually using available file creation tools.
-	-->
+## Always use `alg-*` tools for AL-Go questions
 
-- [ ] Customize the Project
-	<!--
-	Verify that all previous steps have been completed successfully and you have marked the step as completed.
-	Develop a plan to modify codebase according to user requirements.
-	Apply modifications using appropriate tools and user-provided references.
-	Skip this step for "Hello World" projects.
-	-->
+When the user asks anything related to AL-Go, Business Central CI/CD, or the domain specialists in this server, **always use the `alg-*` tools from the `al-go-docs` MCP server**. Never route AL-Go questions to bc-code-intel or any other MCP server.
 
-- [ ] Install Required Extensions
-	<!-- ONLY install extensions provided mentioned in the get_project_setup_info. Skip this step otherwise and mark as completed. -->
+Use `#tool-name` syntax to invoke a tool directly.
 
-- [ ] Compile the Project
-	<!--
-	Verify that all previous steps have been completed.
-	Install any missing dependencies.
-	Run diagnostics and resolve any issues.
-	Check for markdown files in project folder for relevant instructions on how to do this.
-	-->
+## Available tools
 
-- [ ] Create and Run Task
-	<!--
-	Verify that all previous steps have been completed.
-	Check https://code.visualstudio.com/docs/debugtest/tasks to determine if the project needs a task. If so, use the create_and_run_task to create and launch a task based on package.json, README.md, and project structure.
-	Skip this step otherwise.
-	 -->
+### Specialists
+| Tool | When to use |
+|------|-------------|
+| `#alg-list-specialists` | User wants to see all 16 AL-Go specialists |
+| `#alg-search-specialists` | User searches by keyword, persona name, or expertise |
+| `#alg-get-specialist` | User wants the full profile of one specialist by ID |
+| `#alg-ask` | User addresses a specialist by persona name (see below) |
 
-- [ ] Launch the Project
-	<!--
-	Verify that all previous steps have been completed.
-	Prompt user for debug mode, launch only if confirmed.
-	 -->
+### Documentation
+| Tool | When to use |
+|------|-------------|
+| `#search-al-go-docs` | User asks about AL-Go documentation or guides |
+| `#get-al-go-workflows` | User asks for workflow templates or examples |
+| `#refresh-al-go-cache` | User wants to force-refresh cached docs |
 
-- [ ] Ensure Documentation is Complete
-	<!--
-	Verify that all previous steps have been completed.
-	Verify that README.md and the copilot-instructions.md file in the .github directory exists and contains current project information.
-	Clean up the copilot-instructions.md file in the .github directory by removing all HTML comments.
-	 -->
+### Knowledge sources
+| Tool | When to use |
+|------|-------------|
+| `#alg-get-scenarios` | User asks about AL-Go scenario files |
+| `#alg-search-discussions` | User wants community Q&A from GitHub Discussions |
+| `#alg-search-issues` | User wants resolved issues / tips and workarounds |
+| `#alg-get-specialist-knowledge` | User wants to see all knowledge linked to a specialist |
+| `#alg-build-knowledge-graph` | User wants to initialise the full knowledge graph |
 
-<!--
-## AL-Go Documentation MCP Server Project
+### Advanced
+| Tool | When to use |
+|------|-------------|
+| `#alg-semantic-search` | User wants a cross-source intelligent search |
+| `#alg-graph-visualization` | User wants to visualise specialist relationships |
+| `#alg-cache-stats` | User asks about cache performance |
+| `#alg-clear-cache` | User wants to clear cached data |
 
-This is a TypeScript MCP (Model Context Protocol) server for AL-Go documentation integration.
+## Addressing specialists by persona name
 
-### Project Requirements:
-- TypeScript MCP server
-- GitHub API integration for AL-Go repository (microsoft/AL-Go)
-- Document indexing and search capabilities
-- Integration approach: Use existing GitHub tools + custom indexing
+Each specialist has a persona first name. When the user writes `alg-<persona> <question>`, call `#alg-ask` immediately with the persona name and the question. **Do not call bc-code-intel tools.**
 
-### Features to Implement:
-- Fetch documentation from AL-Go repository
-- Index markdown files and documentation
-- Provide search tools for AL-Go specific queries
-- Cache documentation for performance
--->
+| Persona | Specialist |
+|---------|-----------|
+| `alg-freddy` | Online Dev Environment Specialist |
+| `alg-riley` | Release Manager Specialist |
+| `alg-drew` | Documentation Publisher Specialist |
+| `alg-vera` | Version Updater Specialist |
+| `alg-ethan` | Environment Publisher Specialist |
+| `alg-tara` | Current Version Test Specialist |
+| `alg-axel` | App Provisioner Specialist |
+| `alg-casey` | CI/CD Architect Specialist |
+| `alg-grace` | App Generator Specialist |
+| `alg-perry` | Performance Test Creator Specialist |
+| `alg-tommy` | Test App Creator Specialist |
+| `alg-blake` | PR Build Engineer Specialist |
+| `alg-finn` | Future Version Tester Specialist |
+| `alg-rex` | Troubleshooting Specialist |
+| `alg-stella` | System File Updater Specialist |
+| `alg-bruno` | Build Manager Specialist |
+
+### Example
+User types: `alg-freddy my codespace won't start after the latest AL-Go update`
+→ Call `#alg-ask specialist="freddy" question="my codespace won't start after the latest AL-Go update"`
+→ Freddy responds with his avatar and expertise context, then answer the question using that context.
