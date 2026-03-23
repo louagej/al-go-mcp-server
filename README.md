@@ -146,24 +146,24 @@ npx --yes al-go-mcp-server@latest
 
 The server includes 16 AL-Go domain specialists, each with mapped expertise, keywords, related scenarios, and related workflows:
 
-| Avatar | Persona | Specialist | Focus Area |
-|--------|---------|------------|------------|
-| <img src="https://api.multiavatar.com/Freddy.svg" width="48" alt="Freddy"> | **Freddy** | Online Dev Environment Specialist | Create and manage cloud-based dev environments |
-| <img src="https://api.multiavatar.com/Riley.svg" width="48" alt="Riley"> | **Riley** | Release Manager Specialist | Handle release creation and versioning strategies |
-| <img src="https://api.multiavatar.com/Drew.svg" width="48" alt="Drew"> | **Drew** | Documentation Publisher Specialist | Deploy and manage reference documentation |
-| <img src="https://api.multiavatar.com/Vera.svg" width="48" alt="Vera"> | **Vera** | Version Updater Specialist | Manage version number increments and semantic versioning |
-| <img src="https://api.multiavatar.com/Ethan.svg" width="48" alt="Ethan"> | **Ethan** | Environment Publisher Specialist | Publish Business Central apps to environments |
-| <img src="https://api.multiavatar.com/Tara.svg" width="48" alt="Tara"> | **Tara** | Current Version Test Specialist | Run and manage tests against the current version |
-| <img src="https://api.multiavatar.com/Axel.svg" width="48" alt="Axel"> | **Axel** | App Provisioner Specialist | Add and manage existing or test applications |
-| <img src="https://api.multiavatar.com/Casey.svg" width="48" alt="Casey"> | **Casey** | CI/CD Architect Specialist | Configure and optimize CI/CD pipelines |
-| <img src="https://api.multiavatar.com/Grace.svg" width="48" alt="Grace"> | **Grace** | App Generator Specialist | Create new BC applications from templates |
-| <img src="https://api.multiavatar.com/Perry.svg" width="48" alt="Perry"> | **Perry** | Performance Test Creator Specialist | Create and manage performance test applications |
-| <img src="https://api.multiavatar.com/Tommy.svg" width="48" alt="Tommy"> | **Tommy** | Test App Creator Specialist | Create test applications for quality assurance |
-| <img src="https://api.multiavatar.com/Blake.svg" width="48" alt="Blake"> | **Blake** | PR Build Engineer Specialist | Manage pull request build workflows and validation |
-| <img src="https://api.multiavatar.com/Finn.svg" width="48" alt="Finn"> | **Finn** | Future Version Tester Specialist | Test applications against next major/minor versions |
-| <img src="https://api.multiavatar.com/Rex.svg" width="48" alt="Rex"> | **Rex** | Troubleshooting Specialist | Diagnose and resolve AL-Go issues and problems |
-| <img src="https://api.multiavatar.com/Stella.svg" width="48" alt="Stella"> | **Stella** | System File Updater Specialist | Update and maintain AL-Go system files |
-| <img src="https://api.multiavatar.com/Bruno.svg" width="48" alt="Bruno"> | **Bruno** | Build Manager Specialist | Manage AL-Go project builds and configurations |
+| Name | Specialist | Focus Area |
+|------|------------|------------|
+| **Freddy**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Freddy&size=80" alt="Freddy"> | Online Dev Environment Specialist | Create and manage cloud-based dev environments |
+| **Riley**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Riley&size=80" alt="Riley"> | Release Manager Specialist | Handle release creation and versioning strategies |
+| **Drew**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Drew&size=80" alt="Drew"> | Documentation Publisher Specialist | Deploy and manage reference documentation |
+| **Vera**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Vera&size=80" alt="Vera"> | Version Updater Specialist | Manage version number increments and semantic versioning |
+| **Ethan**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Ethan&size=80" alt="Ethan"> | Environment Publisher Specialist | Publish Business Central apps to environments |
+| **Tara**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Tara&size=80" alt="Tara"> | Current Version Test Specialist | Run and manage tests against the current version |
+| **Axel**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Axel&size=80" alt="Axel"> | App Provisioner Specialist | Add and manage existing or test applications |
+| **Casey**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Casey&size=80" alt="Casey"> | CI/CD Architect Specialist | Configure and optimize CI/CD pipelines |
+| **Grace**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Grace&size=80" alt="Grace"> | App Generator Specialist | Create new BC applications from templates |
+| **Perry**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Perry&size=80" alt="Perry"> | Performance Test Creator Specialist | Create and manage performance test applications |
+| **Tommy**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Tommy&size=80" alt="Tommy"> | Test App Creator Specialist | Create test applications for quality assurance |
+| **Blake**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Blake&size=80" alt="Blake"> | PR Build Engineer Specialist | Manage pull request build workflows and validation |
+| **Finn**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Finn&size=80" alt="Finn"> | Future Version Tester Specialist | Test applications against next major/minor versions |
+| **Rex**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Rex&size=80" alt="Rex"> | Troubleshooting Specialist | Diagnose and resolve AL-Go issues and problems |
+| **Stella**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Stella&size=80" alt="Stella"> | System File Updater Specialist | Update and maintain AL-Go system files |
+| **Bruno**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Bruno&size=80" alt="Bruno"> | Build Manager Specialist | Manage AL-Go project builds and configurations |
 
 ## Development
 

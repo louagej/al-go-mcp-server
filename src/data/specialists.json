@@ -23,7 +23,7 @@
       "CreateOnlineEnvironment.yml"
     ],
     "persona": "Freddy",
-    "avatarUrl": "https://api.multiavatar.com/Freddy.svg"
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Freddy&size=80"
   },
   {
     "id": "release-manager",
@@ -51,7 +51,7 @@
       "CreateRelease.yml"
     ],
     "persona": "Riley",
-    "avatarUrl": "https://api.multiavatar.com/Riley.svg"
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Riley&size=80"
   },
   {
     "id": "doc-publisher",
@@ -77,7 +77,7 @@
       "PublishDocumentation.yml"
     ],
     "persona": "Drew",
-    "avatarUrl": "https://api.multiavatar.com/Drew.svg"
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Drew&size=80"
   },
   {
     "id": "version-updater",
@@ -104,7 +104,7 @@
       "IncrementVersionNumber.yml"
     ],
     "persona": "Vera",
-    "avatarUrl": "https://api.multiavatar.com/Vera.svg"
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Vera&size=80"
   },
   {
     "id": "env-publish",
@@ -131,7 +131,7 @@
       "PublishToEnvironment.yml"
     ],
     "persona": "Ethan",
-    "avatarUrl": "https://api.multiavatar.com/Ethan.svg"
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Ethan&size=80"
   },
   {
     "id": "test-current",
@@ -158,7 +158,7 @@
       "TestCurrent.yml"
     ],
     "persona": "Tara",
-    "avatarUrl": "https://api.multiavatar.com/Tara.svg"
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Tara&size=80"
   },
   {
     "id": "app-provisioner",
@@ -186,7 +186,7 @@
       "AddExistingApp.yml"
     ],
     "persona": "Axel",
-    "avatarUrl": "https://api.multiavatar.com/Axel.svg"
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Axel&size=80"
   },
   {
     "id": "cicd-architect",
@@ -216,7 +216,7 @@
       "BuildAndTest.yml"
     ],
     "persona": "Casey",
-    "avatarUrl": "https://api.multiavatar.com/Casey.svg"
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Casey&size=80"
   },
   {
     "id": "app-generator",
@@ -243,7 +243,7 @@
       "CreateApp.yml"
     ],
     "persona": "Grace",
-    "avatarUrl": "https://api.multiavatar.com/Grace.svg"
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Grace&size=80"
   },
   {
     "id": "perf-test-creator",
@@ -269,7 +269,7 @@
       "CreatePerformanceTestApp.yml"
     ],
     "persona": "Perry",
-    "avatarUrl": "https://api.multiavatar.com/Perry.svg"
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Perry&size=80"
   },
   {
     "id": "test-app-creator",
@@ -295,7 +295,7 @@
       "CreateTestApp.yml"
     ],
     "persona": "Tommy",
-    "avatarUrl": "https://api.multiavatar.com/Tommy.svg"
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Tommy&size=80"
   },
   {
     "id": "pr-build-engineer",
@@ -322,7 +322,7 @@
       "PullRequest.yml"
     ],
     "persona": "Blake",
-    "avatarUrl": "https://api.multiavatar.com/Blake.svg"
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Blake&size=80"
   },
   {
     "id": "future-tester",
@@ -351,7 +351,7 @@
       "TestNextMinor.yml"
     ],
     "persona": "Finn",
-    "avatarUrl": "https://api.multiavatar.com/Finn.svg"
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Finn&size=80"
   },
   {
     "id": "troubleshooter",
@@ -378,7 +378,7 @@
     ],
     "relatedWorkflows": [],
     "persona": "Rex",
-    "avatarUrl": "https://api.multiavatar.com/Rex.svg"
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Rex&size=80"
   },
   {
     "id": "system-updater",
@@ -405,7 +405,7 @@
       "UpdateAlGoSystemFiles.yml"
     ],
     "persona": "Stella",
-    "avatarUrl": "https://api.multiavatar.com/Stella.svg"
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Stella&size=80"
   },
   {
     "id": "build-manager",
@@ -431,6 +431,6 @@
       "Build.yml"
     ],
     "persona": "Bruno",
-    "avatarUrl": "https://api.multiavatar.com/Bruno.svg"
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Bruno&size=80"
   }
 ]
