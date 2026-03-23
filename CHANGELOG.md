@@ -9,18 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - 16 AL-Go domain specialists with mapped expertise, keywords, and related scenarios/workflows (App Generator, Build Manager, CI/CD Architect, Deploy Helper, Release Manager, and 11 more)
-- `search-specialists` tool — find specialists by keyword or expertise area
-- `list-specialists` tool — browse all domain specialists
-- `get-specialist` tool — get full profile for a specific specialist
-- `search-discussions` tool — search GitHub Discussions for community Q&A
-- `get-scenarios` tool — fetch AL-Go scenario files from the repository
-- `search-issues` tool — search resolved GitHub Issues for tips and workarounds
-- `get-specialist-knowledge` tool — retrieve all knowledge sources linked to a specialist
-- `build-knowledge-graph` tool — build the complete specialist–knowledge graph
-- `semantic-search` tool — cross-source intelligent search with TF-IDF relevance ranking
-- `graph-visualization` tool — visualize specialist relationships in JSON or text format
-- `cache-stats` tool — view cache hit/miss rates and per-source TTL configuration
-- `clear-cache` tool — clear all, expired, or source-specific cache entries
+- `alg-search-specialists` tool — find specialists by name, persona, keyword, or expertise area
+- `alg-list-specialists` tool — browse all domain specialists
+- `alg-get-specialist` tool — get full profile for a specific specialist
+- `alg-search-discussions` tool — search GitHub Discussions for community Q&A
+- `alg-get-scenarios` tool — fetch AL-Go scenario files from the repository
+- `alg-search-issues` tool — search resolved GitHub Issues for tips and workarounds
+- `alg-get-specialist-knowledge` tool — retrieve all knowledge sources linked to a specialist
+- `alg-build-knowledge-graph` tool — build the complete specialist–knowledge graph
+- `alg-semantic-search` tool — cross-source intelligent search with TF-IDF relevance ranking
+- `alg-graph-visualization` tool — visualize specialist relationships in JSON or text format
+- `alg-cache-stats` tool — view cache hit/miss rates and per-source TTL configuration
+- `alg-clear-cache` tool — clear all, expired, or source-specific cache entries
+- Persona names and DiceBear avatars for all 16 specialists
 - Automated tests in `test/` that run on every CI build and pull request
 
 ### Changed

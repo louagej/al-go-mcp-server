@@ -149,16 +149,26 @@ try {
 console.log('\nTest 6: MCP Tools Registration Check');
 console.log('-'.repeat(60));
 const expectedTools = [
+  // Phase 1 — Documentation
   'search-al-go-docs',
   'get-al-go-workflows',
+  'get-server-version',
+  'refresh-al-go-cache',
+  // Phase 1 — Specialists
   'alg-search-specialists',
   'alg-list-specialists',
   'alg-get-specialist',
+  // Phase 2 — Knowledge sources
   'alg-search-discussions',
   'alg-get-scenarios',
   'alg-search-issues',
   'alg-get-specialist-knowledge',
-  'alg-build-knowledge-graph'
+  'alg-build-knowledge-graph',
+  // Phase 3 — Advanced
+  'alg-semantic-search',
+  'alg-graph-visualization',
+  'alg-cache-stats',
+  'alg-clear-cache',
 ];
 
 console.log(`  Expected tools to be registered: ${expectedTools.length}`);

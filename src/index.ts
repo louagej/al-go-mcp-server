@@ -391,9 +391,9 @@ server.registerTool(
   "alg-search-specialists",
   {
     title: "Search AL-Go Specialists",
-    description: "Search for AL-Go specialists by name, expertise, or keyword",
+    description: "Search for AL-Go specialists by name, persona, expertise, or keyword",
     inputSchema: {
-      query: z.string().describe("Search query (specialist name, expertise, or keyword)")
+      query: z.string().describe("Search query (specialist name, persona name, expertise, or keyword)")
     }
   },
   async ({ query }) => {
