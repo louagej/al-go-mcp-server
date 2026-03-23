@@ -441,7 +441,7 @@ server.registerTool(
     try {
       const specialists = getSpecialistService().getAll();
       const resultText = specialists
-        .map((s, idx) => `${idx + 1}. **${s.name}** (${s.id})\n   ${s.description}`)
+        .map((s, idx) => `${idx + 1}. **${s.persona}** \`@${s.id}\` — ${s.description}`)
         .join('\n\n');
 
       return {
@@ -469,7 +469,7 @@ server.registerTool(
     title: "Get AL-Go Specialist Details",
     description: "Get detailed information about a specific AL-Go specialist",
     inputSchema: {
-      specialistId: z.string().describe("The ID of the specialist (e.g., 'alg-cicd-architect', 'alg-app-generator')")
+      specialistId: z.string().describe("The ID of the specialist (e.g., 'alg-casey', 'alg-grace')")
     }
   },
   async ({ specialistId }) => {
@@ -515,10 +515,10 @@ server.registerTool(
   "alg-ask",
   {
     title: "Ask an AL-Go Specialist",
-    description: "Consult an AL-Go domain specialist for expert guidance on AL-Go workflows, CI/CD pipelines, releases, testing, and Business Central app development. Auto-selects the best specialist based on your question, or use the specialist parameter to request a specific persona (e.g. 'freddy', 'casey', 'rex'). Use this whenever the user asks about AL-Go or addresses a specialist directly (e.g. 'alg-freddy ...', 'ask riley about releases').",
+    description: "Consult an AL-Go domain specialist for expert guidance on AL-Go workflows, CI/CD pipelines, releases, testing, and Business Central app development. Auto-selects the best specialist based on your question, or use the specialist parameter to request a specific persona (e.g. 'freddy', 'casey', 'rex'). Use this whenever the user asks about AL-Go or addresses a specialist directly (e.g. '@alg-freddy ...', 'alg-freddy ...', 'ask riley about releases').",
     inputSchema: {
       question: z.string().describe("The question or problem to bring to the specialist"),
-      specialist: z.string().optional().describe("Optional persona first name (e.g. 'freddy', 'riley', 'casey'). Auto-selects best specialist if omitted.")
+      specialist: z.string().optional().describe("Optional persona name or handle (e.g. 'freddy', '@alg-freddy', 'alg-riley'). Auto-selects best specialist if omitted.")
     }
   },
   async ({ question, specialist }) => {

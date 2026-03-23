@@ -119,7 +119,7 @@ export class SpecialistService {
    * Get specialist by persona name (case-insensitive)
    */
   getByPersona(personaName: string): Specialist | undefined {
-    const lower = personaName.toLowerCase();
+    const lower = personaName.toLowerCase().replace(/^@?alg-/, '');
     return this.specialists.find(s => s.persona?.toLowerCase() === lower);
   }
 
