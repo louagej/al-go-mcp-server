@@ -148,22 +148,22 @@ The server includes 16 AL-Go domain specialists, each with mapped expertise, key
 
 | Specialist | Focus Area |
 |------------|------------|
-| App Generator | Creating new BC apps from templates |
-| App Creator | Full app lifecycle management |
-| Build Manager | Build process orchestration |
-| CI/CD Architect | Pipeline design and implementation |
-| Code Analysis | Code quality and static analysis |
-| Code Signing | Certificate and signing management |
-| Code Structure | Project organization and structure |
-| Release Notes Creator | Release documentation automation |
-| Current Version Tester | Compatibility and regression testing |
-| Deploy Helper | Deployment orchestration |
-| Documentation Publisher | Auto-generated documentation |
-| Performance & Security Tester | Load testing and security validation |
-| PR Build Engineer | Pull request CI/CD pipelines |
-| Project Creator | Project initialization and scaffolding |
-| Release Manager | Release creation and management |
-| Test App Creator | Test application management |
+| App Generator Specialist | Create new BC applications from templates |
+| App Provisioner Specialist | Add and manage existing or test applications |
+| Build Manager Specialist | Manage AL-Go project builds and configurations |
+| CI/CD Architect Specialist | Configure and optimize CI/CD pipelines |
+| Current Version Test Specialist | Run and manage tests against the current version |
+| Documentation Publisher Specialist | Deploy and manage reference documentation |
+| Environment Publisher Specialist | Publish Business Central apps to environments |
+| Future Version Tester Specialist | Test applications against next major/minor versions |
+| Online Dev Environment Specialist | Create and manage cloud-based dev environments |
+| Performance Test Creator Specialist | Create and manage performance test applications |
+| PR Build Engineer Specialist | Manage pull request build workflows and validation |
+| Release Manager Specialist | Handle release creation and versioning strategies |
+| System File Updater Specialist | Update and maintain AL-Go system files |
+| Test App Creator Specialist | Create test applications for quality assurance |
+| Troubleshooting Specialist | Diagnose and resolve AL-Go issues and problems |
+| Version Updater Specialist | Manage version number increments and semantic versioning |
 
 ## Development
 

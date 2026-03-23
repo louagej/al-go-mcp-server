@@ -72,7 +72,7 @@ export class KnowledgeGraphAPI {
       ];
 
       for (const item of allItems) {
-        const nodeId = `${item.source}:${item.title.replace(/\s+/g, '_').toLowerCase()}`;
+        const nodeId = `${item.type}:${item.title.replace(/\s+/g, '_').toLowerCase()}`;
 
         // Add knowledge node (only once per unique item)
         if (!nodes.find(n => n.id === nodeId)) {
@@ -81,7 +81,7 @@ export class KnowledgeGraphAPI {
             type: 'knowledge' as const,
             label: item.title,
             metadata: {
-              source: item.source,
+              source: item.type,
               relevance: item.relevance,
               url: item.url
             }
@@ -165,13 +165,11 @@ export class KnowledgeGraphAPI {
   ): KnowledgeGraph {
     const nodes = new Map<string, GraphNode>();
     const edges: GraphEdge[] = [];
-    const queue = [specialistId];
+    const queue: Array<{ id: string; d: number }> = [{ id: specialistId, d: 0 }];
     const visited = new Set<string>();
 
-    let currentDepth = 0;
-
-    while (queue.length > 0 && currentDepth < depth) {
-      const currentNode = queue.shift()!;
+    while (queue.length > 0) {
+      const { id: currentNode, d: currentDepth } = queue.shift()!;
 
       if (visited.has(currentNode)) continue;
       visited.add(currentNode);
@@ -182,6 +180,9 @@ export class KnowledgeGraphAPI {
         nodes.set(node.id, node);
       }
 
+      // Do not expand further once the depth limit is reached
+      if (currentDepth >= depth) continue;
+
       // Add edges and connected nodes
       for (const edge of graph.edges) {
         if (edge.from === currentNode) {
@@ -189,7 +190,7 @@ export class KnowledgeGraphAPI {
           if (toNode) {
             nodes.set(toNode.id, toNode);
             edges.push(edge);
-            queue.push(edge.to);
+            queue.push({ id: edge.to, d: currentDepth + 1 });
           }
         } else if (edge.to === currentNode) {
           const fromNode = graph.nodes.find(n => n.id === edge.from);
@@ -199,8 +200,6 @@ export class KnowledgeGraphAPI {
           }
         }
       }
-
-      currentDepth++;
     }
 
     return {

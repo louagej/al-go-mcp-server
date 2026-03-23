@@ -43,6 +43,10 @@ export class KnowledgeGraphService {
     discussions: any[],
     issues: any[]
   ): Promise<void> {
+    // Clear stale data before rebuilding
+    this.knowledgeGraph.clear();
+    this.keywordIndex.clear();
+
     // Initialize graph for each specialist
     for (const specialist of specialists) {
       this.knowledgeGraph.set(specialist.id, {

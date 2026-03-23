@@ -287,7 +287,7 @@ export class AlGoService {
             const title = titleMatch ? titleMatch[1] : file.name;
 
             // Extract description from first paragraph
-            const descriptionMatch = content.match(/^[^#](.+?)(?:\n\n|$)/m);
+            const descriptionMatch = content.match(/^(?!#)(.+?)(?:\n\n|$)/m);
             const description = descriptionMatch ? descriptionMatch[1].trim() : "AL-Go scenario";
 
             scenarios.push({
@@ -338,7 +338,7 @@ export class AlGoService {
             const title = titleMatch ? titleMatch[1] : file.name;
 
             // Extract description from first paragraph
-            const descriptionMatch = content.match(/^[^#](.+?)(?:\n\n|$)/m);
+            const descriptionMatch = content.match(/^(?!#)(.+?)(?:\n\n|$)/m);
             const description = descriptionMatch ? descriptionMatch[1].trim() : "AL-Go workshop material";
 
             workshops.push({
@@ -377,17 +377,19 @@ export class AlGoService {
         direction: 'desc'
       });
 
-      issues.push(...issuesList.map(issue => ({
-        number: issue.number,
-        title: issue.title,
-        body: issue.body || "",
-        state: issue.state,
-        labels: issue.labels.map(l => typeof l === 'string' ? l : l.name || ""),
-        createdAt: issue.created_at,
-        updatedAt: issue.updated_at,
-        url: issue.html_url,
-        comments: issue.comments
-      })));
+      issues.push(...issuesList
+        .filter(issue => !('pull_request' in issue))
+        .map(issue => ({
+          number: issue.number,
+          title: issue.title,
+          body: issue.body || "",
+          state: issue.state,
+          labels: issue.labels.map(l => typeof l === 'string' ? l : l.name || ""),
+          createdAt: issue.created_at,
+          updatedAt: issue.updated_at,
+          url: issue.html_url,
+          comments: issue.comments
+        })));
 
       return issues;
     } catch (error) {
@@ -431,17 +433,19 @@ export class AlGoService {
         sort: 'updated'
       });
 
-      return issuesList.map(issue => ({
-        number: issue.number,
-        title: issue.title,
-        body: issue.body || "",
-        state: issue.state,
-        labels: issue.labels.map(l => typeof l === 'string' ? l : l.name || ""),
-        createdAt: issue.created_at,
-        updatedAt: issue.updated_at,
-        url: issue.html_url,
-        comments: issue.comments
-      }));
+      return issuesList
+        .filter(issue => !('pull_request' in issue))
+        .map(issue => ({
+          number: issue.number,
+          title: issue.title,
+          body: issue.body || "",
+          state: issue.state,
+          labels: issue.labels.map(l => typeof l === 'string' ? l : l.name || ""),
+          createdAt: issue.created_at,
+          updatedAt: issue.updated_at,
+          url: issue.html_url,
+          comments: issue.comments
+        }));
     } catch (error) {
       console.error("Error fetching issues by label:", error);
       throw new Error(`Failed to fetch issues by label: ${error instanceof Error ? error.message : 'Unknown error'}`);

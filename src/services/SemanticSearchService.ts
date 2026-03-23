@@ -50,13 +50,14 @@ export class SemanticSearchService {
     let score = 0;
     for (const token of tokens) {
       if (docSet.has(token)) {
-        const tf = documentTokens.filter(t => t === token).length / documentTokens.length;
-        const idf = Math.log(1 / (1 + documentTokens.filter(t => t === token).length));
+        const termCount = documentTokens.filter(t => t === token).length;
+        const tf = termCount / documentTokens.length;
+        const idf = 1 / (1 + termCount);
         score += tf * idf;
       }
     }
 
-    return Math.min(1, score);
+    return Math.max(0, Math.min(1, score));
   }
 
   /**

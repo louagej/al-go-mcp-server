@@ -124,11 +124,14 @@ try {
   const specialists = specialistService.getAll();
 
   const totalSpecialists = specialists.length;
-  const allHaveWorkflows = specialists.every(s => s.relatedWorkflows && s.relatedWorkflows.length >= 0);
+  const allHaveWorkflows = specialists.every(s => Array.isArray(s.relatedWorkflows));
   const allHaveScenarios = specialists.every(s => s.relatedScenarios && Array.isArray(s.relatedScenarios));
   const uniqueIds = new Set(specialists.map(s => s.id)).size;
   const totalExpertiseAreas = specialists.reduce((sum, s) => sum + s.expertise.length, 0);
   const totalKeywords = specialists.reduce((sum, s) => sum + s.keywords.length, 0);
+
+  const avgExpertise = totalSpecialists > 0 ? (totalExpertiseAreas / totalSpecialists).toFixed(1) : 'N/A';
+  const avgKeywords  = totalSpecialists > 0 ? (totalKeywords / totalSpecialists).toFixed(1) : 'N/A';
 
   console.log(`  Total specialists: ${totalSpecialists}`);
   console.log(`  All have workflow references: ${allHaveWorkflows}`);
@@ -136,8 +139,8 @@ try {
   console.log(`  Unique specialist IDs: ${uniqueIds}`);
   console.log(`  Total expertise areas: ${totalExpertiseAreas}`);
   console.log(`  Total keywords: ${totalKeywords}`);
-  console.log(`  Avg expertise per specialist: ${(totalExpertiseAreas / totalSpecialists).toFixed(1)}`);
-  console.log(`  Avg keywords per specialist: ${(totalKeywords / totalSpecialists).toFixed(1)}`);
+  console.log(`  Avg expertise per specialist: ${avgExpertise}`);
+  console.log(`  Avg keywords per specialist: ${avgKeywords}`);
 
   const integrityIssues = [];
   if (totalSpecialists === 0) integrityIssues.push('No specialists loaded');

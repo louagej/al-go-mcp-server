@@ -79,11 +79,6 @@ jobs:
           const changed = process.env.CHANGED || '';
           const fixed   = process.env.FIXED   || '';
 
-          if (!added.trim() && !changed.trim() && !fixed.trim()) {
-            console.error("ERROR: At least one of 'added', 'changed', or 'fixed' must be provided.");
-            process.exit(1);
-          }
-
           function buildSection(title, input) {
             if (!input.trim()) return '';
             const items = input.split(';').map(s => s.trim()).filter(Boolean);
@@ -101,22 +96,36 @@ jobs:
           // Insert the new entry before the first existing version block,
           // unless an entry for this version is already present (manually pre-written).
           const changelog = fs.readFileSync('CHANGELOG.md', 'utf8');
+          let releaseBody;
+
           if (changelog.includes(`## [${version}]`)) {
             console.log(`CHANGELOG.md already contains [${version}] — skipping auto-insert.`);
+            // Extract the existing entry to use in the GitHub Release body
+            const entryStart = changelog.indexOf(`## [${version}]`);
+            const nextEntry  = changelog.indexOf('\n## [', entryStart + 1);
+            const entryText  = nextEntry === -1
+              ? changelog.slice(entryStart).trim()
+              : changelog.slice(entryStart, nextEntry).trim();
+            releaseBody = entryText.split('\n').slice(1).join('\n').trim();
           } else {
+            if (!added.trim() && !changed.trim() && !fixed.trim()) {
+              console.error("ERROR: At least one of 'added', 'changed', or 'fixed' must be provided.");
+              process.exit(1);
+            }
             const insertAt = changelog.indexOf('\n## [');
             const updated  = insertAt === -1
               ? changelog.trimEnd() + '\n\n' + newEntry + '\n'
               : changelog.slice(0, insertAt) + '\n\n' + newEntry + '\n' + changelog.slice(insertAt + 1);
             fs.writeFileSync('CHANGELOG.md', updated);
             console.log(`CHANGELOG.md updated with [${version}] entry.`);
+            releaseBody = sections.trim();
           }
 
           // Generate GitHub Release body
           const releaseNotes = [
             `## What's New in v${version}`,
             '',
-            sections.trim(),
+            releaseBody,
             '',
             '---',
             '',
@@ -140,7 +149,7 @@ jobs:
 
       - name: Commit version bump and changelog
         run: |
-          git add package.json CHANGELOG.md
+          git add package.json package-lock.json CHANGELOG.md
           git commit -m "chore: bump version to ${{ steps.version_bump.outputs.NEW_VERSION }}"
 
       - name: Create and push tag
