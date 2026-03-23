@@ -149,6 +149,8 @@ npx --yes al-go-mcp-server@latest
 
 The server includes 16 AL-Go domain specialists, each with mapped expertise, keywords, related scenarios, and related workflows:
 
+> **Disclaimer:** All persona names and avatars are randomly generated and entirely fictional. They do not represent, depict, or refer to any real person, living or deceased. Any resemblance to actual individuals is purely coincidental.
+
 | Name | Specialist | Focus Area | Sample Chat |
 |------|------------|------------|-------------|
 | **Freddy**<br><img src="https://api.dicebear.com/9.x/adventurer/png?seed=Freddy&size=80" alt="Freddy"> | Online Dev Environment Specialist | Create and manage cloud-based dev environments | `@alg-freddy my codespace won't start after the latest AL-Go update` |
