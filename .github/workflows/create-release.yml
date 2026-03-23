@@ -34,12 +34,12 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
         with:
-          token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN != '' && secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
@@ -52,14 +52,19 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Fetch last merged PR body
+      - name: Fetch PR bodies since last release
         id: pr_body
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          PR_BODY=$(gh pr list --state merged --base main --limit 1 --json body --jq '.[0].body // ""')
-          echo "PR_BODY<<EOF" >> $GITHUB_OUTPUT
-          echo "$PR_BODY" >> $GITHUB_OUTPUT
+          LAST_RELEASE_DATE=$(gh release list --limit 1 --json publishedAt --jq '.[0].publishedAt // ""')
+          if [ -z "$LAST_RELEASE_DATE" ]; then
+            PR_BODIES=$(gh pr list --state merged --base main --json body --jq '[.[].body] | join("\n---PR_SEPARATOR---\n")')
+          else
+            PR_BODIES=$(gh pr list --state merged --base main --json body,mergedAt --jq --arg since "$LAST_RELEASE_DATE" '[.[] | select(.mergedAt > $since) | .body] | join("\n---PR_SEPARATOR---\n")')
+          fi
+          echo "PR_BODIES<<EOF" >> $GITHUB_OUTPUT
+          echo "$PR_BODIES" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Get current version
@@ -79,31 +84,36 @@ jobs:
           ADDED: ${{ github.event.inputs.added }}
           CHANGED: ${{ github.event.inputs.changed }}
           FIXED: ${{ github.event.inputs.fixed }}
-          PR_BODY: ${{ steps.pr_body.outputs.PR_BODY }}
+          PR_BODIES: ${{ steps.pr_body.outputs.PR_BODIES }}
         run: |
           node << 'NODESCRIPT'
           const fs = require('fs');
 
           const version = process.env.NEW_VERSION.replace('v', '');
           const date = new Date().toISOString().split('T')[0];
-          const prBody = process.env.PR_BODY || '';
+          const prBodies = (process.env.PR_BODIES || '').split('\n---PR_SEPARATOR---\n').filter(Boolean);
 
-          // Parse a ### Section from the PR body into a semicolon-separated string
-          function parsePrSection(body, sectionName) {
-            const regex = new RegExp(`###\\s*${sectionName}\\s*\\n([\\s\\S]*?)(?=\\n###|$)`, 'i');
-            const match = body.match(regex);
-            if (!match) return '';
-            return match[1].trim()
-              .split('\n')
-              .map(l => l.replace(/^[-*]\s*/, '').trim())
-              .filter(Boolean)
-              .join(';');
+          // Parse a ### Section across multiple PR bodies, deduplicating items
+          function parsePrSection(bodies, sectionName) {
+            const items = new Set();
+            for (const body of bodies) {
+              const regex = new RegExp(`###\\s*${sectionName}\\s*\\n([\\s\\S]*?)(?=\\n###|$)`, 'i');
+              const match = body.match(regex);
+              if (match) {
+                match[1].trim()
+                  .split('\n')
+                  .map(l => l.replace(/^[-*]\s*/, '').trim())
+                  .filter(Boolean)
+                  .forEach(item => items.add(item));
+              }
+            }
+            return Array.from(items).join(';');
           }
 
-          // Manual inputs take priority; fall back to PR body sections
-          const added   = process.env.ADDED   || parsePrSection(prBody, 'Added');
-          const changed = process.env.CHANGED || parsePrSection(prBody, 'Changed');
-          const fixed   = process.env.FIXED   || parsePrSection(prBody, 'Fixed');
+          // Manual inputs take priority; fall back to aggregated PR body sections
+          const added   = process.env.ADDED   || parsePrSection(prBodies, 'Added');
+          const changed = process.env.CHANGED || parsePrSection(prBodies, 'Changed');
+          const fixed   = process.env.FIXED   || parsePrSection(prBodies, 'Fixed');
 
           function buildSection(title, input) {
             if (!input.trim()) return '';
