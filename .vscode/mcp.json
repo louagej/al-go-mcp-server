@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "al-go-docs": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${workspaceFolder}/build/index.js"]
+    }
+  }
+}

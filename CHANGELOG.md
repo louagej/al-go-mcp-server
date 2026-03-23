@@ -129,9 +129,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - npm package with npx support
 
 ### Features
-- `search-al-go-docs` tool for searching AL-Go documentation
-- `get-al-go-workflows` tool for accessing workflow examples
-- `refresh-al-go-cache` tool for cache management
+- `alg-search-docs` tool for searching AL-Go documentation
+- `alg-get-workflows` tool for accessing workflow examples
+- `alg-refresh-cache` tool for cache management
 - Profile-aware VS Code integration
 - Optional GitHub token authentication for higher rate limits
 

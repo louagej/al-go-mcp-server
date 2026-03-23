@@ -3,6 +3,7 @@ build/
 dist/
 .env
 .vscode/
+!.vscode/mcp.json
 .DS_Store
 npm-debug.log
 *.tgz

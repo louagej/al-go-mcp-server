@@ -265,7 +265,7 @@ server.registerResource(
 
 // Tool: Search AL-Go documentation
 server.registerTool(
-  "search-al-go-docs",
+  "alg-search-docs",
   {
     title: "Search AL-Go Documentation",
     description: "Search through AL-Go documentation for specific queries",
@@ -303,7 +303,7 @@ server.registerTool(
 
 // Tool: Get AL-Go workflow examples
 server.registerTool(
-  "get-al-go-workflows",
+  "alg-get-workflows",
   {
     title: "Get AL-Go Workflow Examples",
     description: "Get examples of AL-Go GitHub workflows",
@@ -339,7 +339,7 @@ server.registerTool(
 
 // Tool: Get server version
 server.registerTool(
-  "get-server-version",
+  "alg-get-server-version",
   {
     title: "Get AL-Go MCP Server Version",
     description: "Get version information for the AL-Go MCP server",
@@ -357,7 +357,7 @@ server.registerTool(
 
 // Tool: Refresh documentation cache
 server.registerTool(
-  "refresh-al-go-cache",
+  "alg-refresh-cache",
   {
     title: "Refresh AL-Go Documentation Cache",
     description: "Refresh the cached AL-Go documentation from the repository",
@@ -434,7 +434,7 @@ server.registerTool(
   "alg-list-specialists",
   {
     title: "List All AL-Go Specialists",
-    description: "List all available AL-Go specialists and their expertise areas",
+    description: "List all available AL-Go specialists and their persona names. After browsing, use alg-ask with the specialist parameter to connect with a specific specialist.",
     inputSchema: {}
   },
   async () => {
@@ -515,41 +515,61 @@ server.registerTool(
   "alg-ask",
   {
     title: "Ask an AL-Go Specialist",
-    description: "Route a question to a specific AL-Go specialist by persona name (e.g. 'freddy', 'riley', 'casey'). The specialist responds with their avatar and full expertise context. Use this when the user addresses a specialist directly, e.g. 'alg-freddy my dev environment can\\'t be reached' or 'ask casey about CI/CD pipeline failures'.",
+    description: "Consult an AL-Go domain specialist for expert guidance on AL-Go workflows, CI/CD pipelines, releases, testing, and Business Central app development. Auto-selects the best specialist based on your question, or use the specialist parameter to request a specific persona (e.g. 'freddy', 'casey', 'rex'). Use this whenever the user asks about AL-Go or addresses a specialist directly (e.g. 'alg-freddy ...', 'ask riley about releases').",
     inputSchema: {
-      specialist: z.string().describe("Persona first name of the specialist (e.g. 'freddy', 'riley', 'casey', 'bruno')"),
-      question: z.string().describe("The question or problem to bring to the specialist")
+      question: z.string().describe("The question or problem to bring to the specialist"),
+      specialist: z.string().optional().describe("Optional persona first name (e.g. 'freddy', 'riley', 'casey'). Auto-selects best specialist if omitted.")
     }
   },
-  async ({ specialist, question }) => {
+  async ({ question, specialist }) => {
     try {
-      const found = getSpecialistService().getByPersona(specialist);
+      const svc = getSpecialistService();
+
+      // Resolve specialist: explicit persona name, or auto-detect from question
+      let found = specialist ? svc.getByPersona(specialist) : undefined;
+      if (!found) {
+        const results = svc.search(question);
+        found = results[0];
+      }
 
       if (!found) {
         return {
           content: [{
             type: "text",
-            text: `No specialist found with persona "${specialist}". Use \`#alg-list-specialists\` to see all available specialists and their persona names.`
+            text: `No matching specialist found. Use \`#alg-list-specialists\` to browse all available specialists and their persona names.`
           }],
           isError: true
         };
       }
 
       const avatarLine = found.avatarUrl
-        ? `![${found.persona}](${found.avatarUrl})\n`
+        ? `![${found.persona}](${found.avatarUrl})\n\n`
         : '';
-      const thinkingHeader = `${avatarLine}**${found.persona}** *(${found.name})* is on it...\n\n---\n\n**Question:** ${question}\n\n`;
 
-      const profile = getSpecialistService().formatSpecialist(found);
-      const related = getSpecialistService().getRelated(found.id);
+      const related = svc.getRelated(found.id);
       const relatedText = related.length > 0
-        ? `\n\n**Related Specialists:**\n${related.map(s => `- **${s.persona ?? s.name}** (${s.name})`).join('\n')}`
+        ? `\n\n**Related specialists:** ${related.map(s => `**${s.persona ?? s.name}**`).join(', ')}`
         : '';
+
+      const expertise = found.expertise.map(e => `- ${e}`).join('\n');
+      const scenarios = found.relatedScenarios.length > 0 ? found.relatedScenarios.join(', ') : 'None';
+      const workflows = found.relatedWorkflows.length > 0 ? found.relatedWorkflows.join(', ') : 'None';
 
       return {
         content: [{
           type: "text",
-          text: `${thinkingHeader}${profile}${relatedText}`
+          text: `${avatarLine}CRITICAL: You ARE **${found.persona}**, the ${found.name}. Respond directly as ${found.persona}, not as a generic AI assistant. Use first person and draw on the expertise listed below.
+
+---
+
+**Question:** ${question}
+
+**${found.persona}'s expertise:**
+${expertise}
+
+**Keywords:** ${found.keywords.join(', ')}
+**Related scenarios:** ${scenarios}
+**Related workflows:** ${workflows}${relatedText}`
         }]
       };
     } catch (error) {
