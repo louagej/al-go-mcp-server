@@ -6,6 +6,12 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { AlGoService } from "./services/AlGoService.js";
 import { DocumentIndex } from "./services/DocumentIndex.js";
+import { SpecialistService } from "./services/SpecialistService.js";
+import { DiscussionService } from "./services/DiscussionService.js";
+import { KnowledgeGraphService } from "./services/KnowledgeGraphService.js";
+import { CacheManager } from "./services/CacheManager.js";
+import { SemanticSearchService } from "./services/SemanticSearchService.js";
+import { KnowledgeGraphAPI } from "./services/KnowledgeGraphAPI.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -76,6 +82,12 @@ async function main() {
     // Initialize services lazily to avoid startup messages for --version/--help
     let alGoService: AlGoService;
     let documentIndex: DocumentIndex;
+    let specialistService: SpecialistService;
+    let discussionService: DiscussionService;
+    let knowledgeGraphService: KnowledgeGraphService;
+    let cacheManager: CacheManager;
+    let semanticSearchService: SemanticSearchService;
+    let knowledgeGraphAPI: KnowledgeGraphAPI;
 
     function getAlGoService(): AlGoService {
       if (!alGoService) {
@@ -89,6 +101,48 @@ async function main() {
         documentIndex = new DocumentIndex();
       }
       return documentIndex;
+    }
+
+    function getSpecialistService(): SpecialistService {
+      if (!specialistService) {
+        specialistService = new SpecialistService();
+      }
+      return specialistService;
+    }
+
+    function getDiscussionService(): DiscussionService {
+      if (!discussionService) {
+        discussionService = new DiscussionService(getAlGoService().getOctokit());
+      }
+      return discussionService;
+    }
+
+    function getKnowledgeGraphService(): KnowledgeGraphService {
+      if (!knowledgeGraphService) {
+        knowledgeGraphService = new KnowledgeGraphService();
+      }
+      return knowledgeGraphService;
+    }
+
+    function getCacheManager(): CacheManager {
+      if (!cacheManager) {
+        cacheManager = new CacheManager();
+      }
+      return cacheManager;
+    }
+
+    function getSemanticSearchService(): SemanticSearchService {
+      if (!semanticSearchService) {
+        semanticSearchService = new SemanticSearchService();
+      }
+      return semanticSearchService;
+    }
+
+    function getKnowledgeGraphAPI(): KnowledgeGraphAPI {
+      if (!knowledgeGraphAPI) {
+        knowledgeGraphAPI = new KnowledgeGraphAPI();
+      }
+      return knowledgeGraphAPI;
     }
 
 // Resource: Get server version information
@@ -154,6 +208,56 @@ server.registerResource(
         uri: uri.href,
         text: content,
         mimeType: "text/markdown"
+      }]
+    };
+  }
+);
+
+// Resource: List all specialists
+server.registerResource(
+  "specialists-list",
+  "al-go://specialists/list",
+  {
+    title: "AL-Go Specialists List",
+    description: "List of all available AL-Go specialists"
+  },
+  async (uri) => {
+    const specialists = getSpecialistService().getAll();
+    const specialistsJson = JSON.stringify(specialists, null, 2);
+    return {
+      contents: [{
+        uri: uri.href,
+        text: specialistsJson,
+        mimeType: "application/json"
+      }]
+    };
+  }
+);
+
+// Resource: Get specific specialist
+server.registerResource(
+  "specialist-detail",
+  "al-go://specialists/{id}",
+  {
+    title: "AL-Go Specialist Details",
+    description: "Get details about a specific AL-Go specialist"
+  },
+  async (uri) => {
+    const specialistId = new URL(uri.href).pathname.split('/').pop();
+    if (!specialistId) {
+      throw new Error("Specialist ID required");
+    }
+
+    const specialist = getSpecialistService().getById(specialistId);
+    if (!specialist) {
+      throw new Error(`Specialist not found: ${specialistId}`);
+    }
+
+    return {
+      contents: [{
+        uri: uri.href,
+        text: JSON.stringify(specialist, null, 2),
+        mimeType: "application/json"
       }]
     };
   }
@@ -275,6 +379,556 @@ server.registerTool(
         content: [{
           type: "text",
           text: `Error refreshing AL-Go cache: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }],
+        isError: true
+      };
+    }
+  }
+);
+
+// Tool: Search specialists
+server.registerTool(
+  "search-specialists",
+  {
+    title: "Search AL-Go Specialists",
+    description: "Search for AL-Go specialists by name, expertise, or keyword",
+    inputSchema: {
+      query: z.string().describe("Search query (specialist name, expertise, or keyword)")
+    }
+  },
+  async ({ query }) => {
+    try {
+      const results = getSpecialistService().search(query);
+
+      if (results.length === 0) {
+        return {
+          content: [{
+            type: "text",
+            text: `No specialists found matching "${query}".`
+          }]
+        };
+      }
+
+      const resultText = getSpecialistService().formatSpecialists(results);
+
+      return {
+        content: [{
+          type: "text",
+          text: `Found ${results.length} specialist(s) for "${query}":\n\n${resultText}`
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `Error searching specialists: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }],
+        isError: true
+      };
+    }
+  }
+);
+
+// Tool: List all specialists
+server.registerTool(
+  "list-specialists",
+  {
+    title: "List All AL-Go Specialists",
+    description: "List all available AL-Go specialists and their expertise areas",
+    inputSchema: {}
+  },
+  async () => {
+    try {
+      const specialists = getSpecialistService().getAll();
+      const resultText = specialists
+        .map((s, idx) => `${idx + 1}. **${s.name}** (${s.id})\n   ${s.description}`)
+        .join('\n\n');
+
+      return {
+        content: [{
+          type: "text",
+          text: `Available AL-Go Specialists (${specialists.length} total):\n\n${resultText}`
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `Error listing specialists: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }],
+        isError: true
+      };
+    }
+  }
+);
+
+// Tool: Get specialist details
+server.registerTool(
+  "get-specialist",
+  {
+    title: "Get AL-Go Specialist Details",
+    description: "Get detailed information about a specific AL-Go specialist",
+    inputSchema: {
+      specialistId: z.string().describe("The ID of the specialist (e.g., 'cicd-architect', 'app-generator')")
+    }
+  },
+  async ({ specialistId }) => {
+    try {
+      const specialist = getSpecialistService().getById(specialistId);
+
+      if (!specialist) {
+        return {
+          content: [{
+            type: "text",
+            text: `Specialist not found: ${specialistId}. Use 'list-specialists' to see available specialists.`
+          }],
+          isError: true
+        };
+      }
+
+      const formattedSpecialist = getSpecialistService().formatSpecialist(specialist);
+      const relatedSpecialists = getSpecialistService().getRelated(specialistId);
+      const relatedText = relatedSpecialists.length > 0
+        ? `\n\n**Related Specialists:**\n${relatedSpecialists.map(s => `- ${s.name}`).join('\n')}`
+        : '';
+
+      return {
+        content: [{
+          type: "text",
+          text: `${formattedSpecialist}${relatedText}`
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `Error retrieving specialist details: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }],
+        isError: true
+      };
+    }
+  }
+);
+
+// Tool: Search discussions
+server.registerTool(
+  "search-discussions",
+  {
+    title: "Search AL-Go GitHub Discussions",
+    description: "Search for relevant discussions in the AL-Go repository",
+    inputSchema: {
+      query: z.string().describe("Search query for discussions"),
+      limit: z.number().default(10).describe("Maximum number of results to return")
+    }
+  },
+  async ({ query, limit }) => {
+    try {
+      const results = await getDiscussionService().searchDiscussions(query, limit);
+
+      if (results.length === 0) {
+        return {
+          content: [{
+            type: "text",
+            text: `No discussions found matching "${query}".`
+          }]
+        };
+      }
+
+      const resultText = results
+        .map((d, idx) => getDiscussionService().formatDiscussion(d))
+        .join('\n\n---\n\n');
+
+      return {
+        content: [{
+          type: "text",
+          text: `Found ${results.length} discussion(s) for "${query}":\n\n${resultText}`
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `Error searching discussions: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }],
+        isError: true
+      };
+    }
+  }
+);
+
+// Tool: Get scenarios
+server.registerTool(
+  "get-scenarios",
+  {
+    title: "Get AL-Go Scenarios",
+    description: "Get available AL-Go setup scenarios",
+    inputSchema: {}
+  },
+  async () => {
+    try {
+      const scenarios = await getAlGoService().getScenarios();
+
+      if (scenarios.length === 0) {
+        return {
+          content: [{
+            type: "text",
+            text: "No scenarios found."
+          }]
+        };
+      }
+
+      const resultText = scenarios
+        .map((s, idx) => `${idx + 1}. **${s.name}**\n   ${s.description}`)
+        .join('\n\n');
+
+      return {
+        content: [{
+          type: "text",
+          text: `Available AL-Go Scenarios (${scenarios.length} total):\n\n${resultText}`
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `Error fetching scenarios: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }],
+        isError: true
+      };
+    }
+  }
+);
+
+// Tool: Search resolved issues
+server.registerTool(
+  "search-issues",
+  {
+    title: "Search AL-Go Resolved Issues",
+    description: "Search for tips and tricks in resolved AL-Go issues",
+    inputSchema: {
+      query: z.string().describe("Search query for issues"),
+      limit: z.number().default(10).describe("Maximum number of results to return")
+    }
+  },
+  async ({ query, limit }) => {
+    try {
+      const results = await getAlGoService().searchIssues(query, limit);
+
+      if (results.length === 0) {
+        return {
+          content: [{
+            type: "text",
+            text: `No issues found matching "${query}".`
+          }]
+        };
+      }
+
+      const resultText = results
+        .map((i, idx) => `${idx + 1}. **${i.title}** (#${i.number})\n   Status: ${i.state}\n   Comments: ${i.comments}\n   [View Issue](${i.url})`)
+        .join('\n\n');
+
+      return {
+        content: [{
+          type: "text",
+          text: `Found ${results.length} issue(s) matching "${query}":\n\n${resultText}`
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `Error searching issues: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }],
+        isError: true
+      };
+    }
+  }
+);
+
+// Tool: Get specialist knowledge
+server.registerTool(
+  "get-specialist-knowledge",
+  {
+    title: "Get Specialist Knowledge",
+    description: "Get comprehensive knowledge for a specialist including workshops, scenarios, discussions, and issues",
+    inputSchema: {
+      specialistId: z.string().describe("The ID of the specialist")
+    }
+  },
+  async ({ specialistId }) => {
+    try {
+      const knowledge = getKnowledgeGraphService().getSpecialistKnowledge(specialistId);
+
+      if (!knowledge) {
+        return {
+          content: [{
+            type: "text",
+            text: `Specialist not found: ${specialistId}`
+          }],
+          isError: true
+        };
+      }
+
+      const formattedKnowledge = getKnowledgeGraphService().formatSpecialistKnowledge(specialistId);
+
+      return {
+        content: [{
+          type: "text",
+          text: formattedKnowledge
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `Error retrieving specialist knowledge: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }],
+        isError: true
+      };
+    }
+  }
+);
+
+// Tool: Build knowledge graph
+server.registerTool(
+  "build-knowledge-graph",
+  {
+    title: "Build Knowledge Graph",
+    description: "Initialize and build the knowledge graph linking specialists to all knowledge sources",
+    inputSchema: {}
+  },
+  async () => {
+    try {
+      console.error("Building knowledge graph...");
+
+      const specialists = getSpecialistService().getAll();
+      const workshops = await getAlGoService().getWorkshopFiles();
+      const scenarios = await getAlGoService().getScenarios();
+      const discussions = await getDiscussionService().fetchDiscussions(20);
+      const issues = await getAlGoService().getResolvedIssues(20);
+
+      await getKnowledgeGraphService().buildKnowledgeGraph(
+        specialists,
+        workshops,
+        scenarios,
+        discussions,
+        issues
+      );
+
+      const stats = getKnowledgeGraphService().getStats();
+      const statsText = Object.entries(stats.specialistStats)
+        .slice(0, 5)
+        .map(([id, stat]) => `- ${id}: ${stat.workshops + stat.scenarios + stat.discussions + stat.issues} items`)
+        .join('\n');
+
+      return {
+        content: [{
+          type: "text",
+          text: `Knowledge graph built successfully!\n\nTotal Specialists: ${stats.totalSpecialists}\n\nTop Specialists:\n${statsText}`
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `Error building knowledge graph: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }],
+        isError: true
+      };
+    }
+  }
+);
+
+// === PHASE 3: Advanced Features ===
+
+// Tool: Semantic search across all knowledge sources
+server.registerTool(
+  "semantic-search",
+  {
+    title: "Semantic Search",
+    description: "Intelligent cross-source search across workshops, scenarios, discussions, and issues using relevance scoring",
+    inputSchema: {
+      query: z.string().describe("Search query"),
+      limit: z.number().default(10).describe("Maximum results to return")
+    }
+  },
+  async ({ query, limit }) => {
+    try {
+      const semanticSearch = getSemanticSearchService();
+
+      // Fetch knowledge from all sources (in production, would use cache)
+      const workshops = await getAlGoService().getWorkshopFiles();
+      const scenarios = await getAlGoService().getScenarios();
+      const discussions = await getDiscussionService().fetchDiscussions(20);
+      const issues = await getAlGoService().getResolvedIssues(20);
+
+      const results = semanticSearch.search(
+        query,
+        { workshops, scenarios, discussions, issues },
+        limit
+      );
+
+      const resultText = semanticSearch.formatResults(results);
+
+      return {
+        content: [{
+          type: "text",
+          text: resultText
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `Error performing semantic search: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }],
+        isError: true
+      };
+    }
+  }
+);
+
+// Tool: Get knowledge graph visualization
+server.registerTool(
+  "graph-visualization",
+  {
+    title: "Knowledge Graph Visualization",
+    description: "Get knowledge graph structure for visualization (nodes and edges)",
+    inputSchema: {
+      format: z.enum(["json", "stats"]).default("json").describe("Output format")
+    }
+  },
+  async ({ format }) => {
+    try {
+      const specialists = getSpecialistService().getAll();
+      const knowledgeGraphService = getKnowledgeGraphService();
+      const graphAPI = getKnowledgeGraphAPI();
+
+      // For now, create a simple graph with specialist nodes
+      // In production, would use built knowledge graph
+      const nodes = specialists.map(s => ({
+        id: s.id,
+        type: 'specialist' as const,
+        label: s.name,
+        metadata: { description: s.description }
+      }));
+
+      // Create edges between related specialists
+      const edges: any[] = [];
+      for (let i = 0; i < specialists.length; i++) {
+        const related = getSpecialistService().getRelated(specialists[i].id);
+        for (const rel of related) {
+          edges.push({
+            from: specialists[i].id,
+            to: rel.id,
+            type: 'relates-to',
+            weight: 0.7
+          });
+        }
+      }
+
+      const graph = {
+        nodes,
+        edges,
+        metadata: {
+          totalSpecialists: specialists.length,
+          totalKnowledge: 0,
+          averageConnections: edges.length / specialists.length
+        }
+      };
+
+      if (format === 'json') {
+        return {
+          content: [{
+            type: "text",
+            text: JSON.stringify(graphAPI.formatForVisualization(graph), null, 2)
+          }]
+        };
+      } else {
+        return {
+          content: [{
+            type: "text",
+            text: graphAPI.formatStats(graph)
+          }]
+        };
+      }
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `Error generating graph visualization: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }],
+        isError: true
+      };
+    }
+  }
+);
+
+// Tool: Get cache statistics
+server.registerTool(
+  "cache-stats",
+  {
+    title: "Cache Statistics",
+    description: "Get cache hit rates and statistics for knowledge sources",
+    inputSchema: {}
+  },
+  async () => {
+    try {
+      const cache = getCacheManager();
+      const stats = cache.formatStats();
+
+      return {
+        content: [{
+          type: "text",
+          text: `**Cache Performance**\n\n${stats}`
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `Error retrieving cache statistics: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }],
+        isError: true
+      };
+    }
+  }
+);
+
+// Tool: Clear cache selectively
+server.registerTool(
+  "clear-cache",
+  {
+    title: "Clear Cache",
+    description: "Clear cached knowledge sources or entire cache",
+    inputSchema: {
+      source: z.enum(["workshop", "scenario", "discussion", "issue", "all"]).default("all").describe("Cache source to clear")
+    }
+  },
+  async ({ source }) => {
+    try {
+      const cache = getCacheManager();
+
+      let message = '';
+      if (source === 'all') {
+        cache.clearAll();
+        message = 'All cache cleared successfully';
+      } else {
+        const count = cache.clearSource(source);
+        message = `Cleared ${count} item(s) from ${source} cache`;
+      }
+
+      return {
+        content: [{
+          type: "text",
+          text: `✓ ${message}`
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `Error clearing cache: ${error instanceof Error ? error.message : 'Unknown error'}`
         }],
         isError: true
       };

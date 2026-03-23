@@ -1,0 +1,311 @@
+[
+  {
+    "id": "online-dev-env",
+    "name": "Online Dev Environment Specialist",
+    "description": "Create and manage cloud-based development environments for AL-Go projects",
+    "expertise": [
+      "Cloud development environments",
+      "GitHub Codespaces setup",
+      "Container configuration",
+      "Environment provisioning"
+    ],
+    "keywords": ["dev environment", "codespaces", "cloud", "online", "setup"],
+    "relatedScenarios": [
+      "Online development environment.md"
+    ],
+    "relatedWorkflows": [
+      "CreateOnlineEnvironment.yml"
+    ]
+  },
+  {
+    "id": "release-manager",
+    "name": "Release Manager Specialist",
+    "description": "Handle release creation, versioning strategies, and deployment coordination",
+    "expertise": [
+      "Release creation",
+      "Version management",
+      "Release notes",
+      "Deployment coordination",
+      "Release workflows"
+    ],
+    "keywords": ["release", "version", "deployment", "publish", "increment"],
+    "relatedScenarios": [
+      "CreateRelease.md",
+      "IncrementVersionNumber.md"
+    ],
+    "relatedWorkflows": [
+      "CreateRelease.yml"
+    ]
+  },
+  {
+    "id": "doc-publisher",
+    "name": "Documentation Publisher Specialist",
+    "description": "Deploy and manage reference documentation for Business Central extensions",
+    "expertise": [
+      "Documentation generation",
+      "Documentation hosting",
+      "Update procedures",
+      "Reference docs"
+    ],
+    "keywords": ["documentation", "docs", "reference", "publish", "deploy docs"],
+    "relatedScenarios": [
+      "DeployReferenceDocumentation.md"
+    ],
+    "relatedWorkflows": [
+      "PublishDocumentation.yml"
+    ]
+  },
+  {
+    "id": "version-updater",
+    "name": "Version Updater Specialist",
+    "description": "Manage version number increments and semantic versioning",
+    "expertise": [
+      "Version numbering",
+      "Semantic versioning",
+      "Version increments",
+      "Version files",
+      "App manifest updates"
+    ],
+    "keywords": ["version", "increment", "semantic", "versioning", "app.json"],
+    "relatedScenarios": [
+      "IncrementVersionNumber.md"
+    ],
+    "relatedWorkflows": [
+      "IncrementVersionNumber.yml"
+    ]
+  },
+  {
+    "id": "env-publish",
+    "name": "Environment Publisher Specialist",
+    "description": "Publish Business Central apps to various environments",
+    "expertise": [
+      "Environment publishing",
+      "App deployment",
+      "Environment configuration",
+      "Publishing targets",
+      "Tenant management"
+    ],
+    "keywords": ["publish", "environment", "deployment", "tenant", "app publish"],
+    "relatedScenarios": [
+      "PublishToEnvironment.md"
+    ],
+    "relatedWorkflows": [
+      "PublishToEnvironment.yml"
+    ]
+  },
+  {
+    "id": "test-current",
+    "name": "Current Version Test Specialist",
+    "description": "Run and manage tests against current version of applications",
+    "expertise": [
+      "Test execution",
+      "Test configuration",
+      "Test results analysis",
+      "Quality assurance",
+      "Current version testing"
+    ],
+    "keywords": ["test", "testing", "current", "quality", "validation"],
+    "relatedScenarios": [
+      "TestCurrentVersion.md"
+    ],
+    "relatedWorkflows": [
+      "TestCurrent.yml"
+    ]
+  },
+  {
+    "id": "app-provisioner",
+    "name": "App Provisioner Specialist",
+    "description": "Add and manage existing or test applications to projects",
+    "expertise": [
+      "App provisioning",
+      "Test apps",
+      "Existing app integration",
+      "App dependencies",
+      "App configuration"
+    ],
+    "keywords": ["app", "provisioner", "existing app", "test app", "dependency"],
+    "relatedScenarios": [
+      "AddExistingTestApp.md",
+      "AddExistingAppOrTestApp.md"
+    ],
+    "relatedWorkflows": [
+      "AddExistingApp.yml"
+    ]
+  },
+  {
+    "id": "cicd-architect",
+    "name": "CI/CD Architect Specialist",
+    "description": "Configure and optimize continuous integration and deployment pipelines",
+    "expertise": [
+      "CI/CD configuration",
+      "Pipeline design",
+      "Automation",
+      "Build configuration",
+      "Deployment strategies",
+      "GitHub Actions"
+    ],
+    "keywords": ["cicd", "pipeline", "automation", "build", "integration"],
+    "relatedScenarios": [
+      "CiCdPipeline.md",
+      "ContinuousIntegration.md"
+    ],
+    "relatedWorkflows": [
+      "CICD.yml",
+      "BuildAndTest.yml"
+    ]
+  },
+  {
+    "id": "app-generator",
+    "name": "App Generator Specialist",
+    "description": "Create new Business Central applications from templates",
+    "expertise": [
+      "App creation",
+      "Project scaffolding",
+      "App structure",
+      "Template configuration",
+      "App initialization"
+    ],
+    "keywords": ["create", "app", "generator", "new", "scaffold"],
+    "relatedScenarios": [
+      "CreateNewApp.md"
+    ],
+    "relatedWorkflows": [
+      "CreateApp.yml"
+    ]
+  },
+  {
+    "id": "perf-test-creator",
+    "name": "Performance Test Creator Specialist",
+    "description": "Create and manage performance test applications for load testing",
+    "expertise": [
+      "Performance testing",
+      "Load testing",
+      "Test apps",
+      "Performance metrics",
+      "Benchmarking"
+    ],
+    "keywords": ["performance", "perf test", "load test", "benchmark"],
+    "relatedScenarios": [
+      "CreateNewPerformanceTestApp.md"
+    ],
+    "relatedWorkflows": [
+      "CreatePerformanceTestApp.yml"
+    ]
+  },
+  {
+    "id": "test-app-creator",
+    "name": "Test App Creator Specialist",
+    "description": "Create test applications for validation and quality assurance",
+    "expertise": [
+      "Test app creation",
+      "Test configuration",
+      "Test structure",
+      "Test frameworks",
+      "Quality assurance"
+    ],
+    "keywords": ["test app", "create test", "testing", "qa"],
+    "relatedScenarios": [
+      "CreateNewTestApp.md"
+    ],
+    "relatedWorkflows": [
+      "CreateTestApp.yml"
+    ]
+  },
+  {
+    "id": "pr-build-engineer",
+    "name": "PR Build Engineer Specialist",
+    "description": "Manage pull request build workflows and validation",
+    "expertise": [
+      "PR builds",
+      "Pull request workflows",
+      "Build validation",
+      "PR checks",
+      "Code quality gates"
+    ],
+    "keywords": ["pull request", "pr", "build", "validation"],
+    "relatedScenarios": [
+      "PullRequestBuild.md"
+    ],
+    "relatedWorkflows": [
+      "PullRequestBuild.yml",
+      "PullRequest.yml"
+    ]
+  },
+  {
+    "id": "future-tester",
+    "name": "Future Version Tester Specialist",
+    "description": "Test applications against next major and minor versions",
+    "expertise": [
+      "Future version testing",
+      "Next major version",
+      "Next minor version",
+      "Compatibility testing",
+      "Upgrade validation"
+    ],
+    "keywords": ["test next", "future", "major", "minor", "compatibility"],
+    "relatedScenarios": [
+      "TestNextMajor.md",
+      "TestNextMinor.md"
+    ],
+    "relatedWorkflows": [
+      "TestNextMajor.yml",
+      "TestNextMinor.yml"
+    ]
+  },
+  {
+    "id": "troubleshooter",
+    "name": "Troubleshooting Specialist",
+    "description": "Diagnose and resolve AL-Go issues and problems",
+    "expertise": [
+      "Problem diagnosis",
+      "Error resolution",
+      "Debugging",
+      "Log analysis",
+      "Issue resolution",
+      "Best practices"
+    ],
+    "keywords": ["troubleshooting", "troubleshoot", "issue", "problem", "error", "debug"],
+    "relatedScenarios": [
+      "Troubleshooting.md"
+    ],
+    "relatedWorkflows": []
+  },
+  {
+    "id": "system-updater",
+    "name": "System File Updater Specialist",
+    "description": "Update and maintain AL-Go system files and configuration",
+    "expertise": [
+      "System file updates",
+      "Configuration management",
+      "GitHub workflow updates",
+      "Settings management",
+      "System maintenance"
+    ],
+    "keywords": ["update", "system", "files", "maintain", "upgrade"],
+    "relatedScenarios": [
+      "UpdateAlGoSystemFiles.md"
+    ],
+    "relatedWorkflows": [
+      "UpdateAlGoSystemFiles.yml"
+    ]
+  },
+  {
+    "id": "build-manager",
+    "name": "Build Manager Specialist",
+    "description": "Manage AL-Go project builds and build configurations",
+    "expertise": [
+      "Build process",
+      "Build configuration",
+      "Build optimization",
+      "Build output",
+      "Build artifacts"
+    ],
+    "keywords": ["build", "build al-go", "compilation", "artifacts"],
+    "relatedScenarios": [
+      "BuildAlGoProject.md"
+    ],
+    "relatedWorkflows": [
+      "Build.yml"
+    ]
+  }
+]
