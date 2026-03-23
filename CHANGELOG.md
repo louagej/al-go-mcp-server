@@ -10,6 +10,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+
+## [2.6.0] - 2026-03-23
+
+### Added
+- PR body parsing in Create Release workflow — `### Added`, `### Changed`, `### Fixed` sections are automatically extracted as release notes when manual inputs are left blank
+
+### Changed
+- Checkout step now always uses `GITHUB_TOKEN` instead of a PAT token fallback
+- Push step sets the remote URL with the appropriate token (`PAT_TOKEN` if set, otherwise `GITHUB_TOKEN`) immediately before pushing
+- Release notes now aggregate all PR bodies merged since the last release tag (previously only the latest PR was included)
+- Duplicate changelog entries across multiple PRs are automatically deduplicated
+- PR template updated to align with release workflow format, using `### Added / ### Changed / ### Fixed` sections
+- `bootstrapAgentFiles()` now includes `name:` frontmatter field in generated `.agent.md` files
+
+### Fixed
+- `fatal: could not read Username` error when running the Create Release workflow caused by an invalid or expired `PAT_TOKEN` being used for checkout
+- --
+- ## Checklist
+- [ ] ✅ Built successfully (`npm run build`)
+- [ ] ✅ Tests pass (`node test/test-functionality.mjs && node test/test-phase2.mjs`)
+- [ ] ✅ No sensitive information committed
+- [ ] ✅ README updated (if applicable)
+- Added missing `name:` frontmatter field to all 16 `.github/agents/alg-*.agent.md` files — required by VS Code for `@alg-*` handles to appear in the Copilot Chat agent picker
+- [x] ✅ Built successfully (`npm run build`)
+- [x] ✅ Tests pass (`node test/test-functionality.mjs && node test/test-phase2.mjs`)
+- [x] ✅ No sensitive information committed
+
 ## [2.5.0] - 2026-03-23
 
 ### Added
