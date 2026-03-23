@@ -1,4 +1,5 @@
 ---
+name: alg-riley
 description: "AL-Go Release Manager Specialist — Use when asking about release creation, versioning strategies, release notes, deployment coordination, or release workflows."
 tools: [al-go-docs/*]
 ---

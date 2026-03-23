@@ -1,4 +1,5 @@
 ---
+name: alg-blake
 description: "AL-Go PR Build Engineer Specialist — Use when asking about pull request builds, PR workflows, build validation, PR checks, or code quality gates."
 tools: [al-go-docs/*]
 ---

@@ -1,4 +1,5 @@
 ---
+name: alg-bruno
 description: "AL-Go Build Manager Specialist — Use when asking about AL-Go project builds, build configuration, build optimization, build output, or build artifacts."
 tools: [al-go-docs/*]
 ---

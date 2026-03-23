@@ -1,4 +1,5 @@
 ---
+name: alg-ethan
 description: "AL-Go Environment Publisher Specialist — Use when asking about publishing apps to environments, app deployment, environment configuration, or tenant management."
 tools: [al-go-docs/*]
 ---

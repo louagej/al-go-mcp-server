@@ -1,4 +1,5 @@
 ---
+name: alg-perry
 description: "AL-Go Performance Test Creator Specialist — Use when asking about performance testing, load testing, test apps for benchmarking, or performance metrics."
 tools: [al-go-docs/*]
 ---

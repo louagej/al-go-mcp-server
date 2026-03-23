@@ -1,4 +1,5 @@
 ---
+name: alg-casey
 description: "AL-Go CI/CD Architect Specialist — Use when asking about CI/CD configuration, pipeline design, automation, build configuration, deployment strategies, or GitHub Actions."
 tools: [al-go-docs/*]
 ---

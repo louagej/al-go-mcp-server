@@ -1,4 +1,5 @@
 ---
+name: alg-rex
 description: "AL-Go Troubleshooting Specialist — Use when asking about diagnosing AL-Go issues, error resolution, debugging, log analysis, or best practices."
 tools: [al-go-docs/*]
 ---

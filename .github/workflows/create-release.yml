@@ -52,6 +52,16 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Fetch last merged PR body
+        id: pr_body
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_BODY=$(gh pr list --state merged --base main --limit 1 --json body --jq '.[0].body // ""')
+          echo "PR_BODY<<EOF" >> $GITHUB_OUTPUT
+          echo "$PR_BODY" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
       - name: Get current version
         id: current_version
         run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
@@ -69,15 +79,31 @@ jobs:
           ADDED: ${{ github.event.inputs.added }}
           CHANGED: ${{ github.event.inputs.changed }}
           FIXED: ${{ github.event.inputs.fixed }}
+          PR_BODY: ${{ steps.pr_body.outputs.PR_BODY }}
         run: |
           node << 'NODESCRIPT'
           const fs = require('fs');
 
           const version = process.env.NEW_VERSION.replace('v', '');
           const date = new Date().toISOString().split('T')[0];
-          const added   = process.env.ADDED   || '';
-          const changed = process.env.CHANGED || '';
-          const fixed   = process.env.FIXED   || '';
+          const prBody = process.env.PR_BODY || '';
+
+          // Parse a ### Section from the PR body into a semicolon-separated string
+          function parsePrSection(body, sectionName) {
+            const regex = new RegExp(`###\\s*${sectionName}\\s*\\n([\\s\\S]*?)(?=\\n###|$)`, 'i');
+            const match = body.match(regex);
+            if (!match) return '';
+            return match[1].trim()
+              .split('\n')
+              .map(l => l.replace(/^[-*]\s*/, '').trim())
+              .filter(Boolean)
+              .join(';');
+          }
+
+          // Manual inputs take priority; fall back to PR body sections
+          const added   = process.env.ADDED   || parsePrSection(prBody, 'Added');
+          const changed = process.env.CHANGED || parsePrSection(prBody, 'Changed');
+          const fixed   = process.env.FIXED   || parsePrSection(prBody, 'Fixed');
 
           function buildSection(title, input) {
             if (!input.trim()) return '';
@@ -109,8 +135,7 @@ jobs:
             releaseBody = entryText.split('\n').slice(1).join('\n').trim();
           } else {
             if (!added.trim() && !changed.trim() && !fixed.trim()) {
-              console.error("ERROR: At least one of 'added', 'changed', or 'fixed' must be provided.");
-              process.exit(1);
+              console.warn("WARNING: No release notes found in manual inputs or PR body — changelog entry will be empty.");
             }
             const insertAt = changelog.indexOf('\n## [');
             const updated  = insertAt === -1

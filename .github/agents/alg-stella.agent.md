@@ -1,4 +1,5 @@
 ---
+name: alg-stella
 description: "AL-Go System File Updater Specialist — Use when asking about updating AL-Go system files, configuration management, GitHub workflow updates, or system maintenance."
 tools: [al-go-docs/*]
 ---
