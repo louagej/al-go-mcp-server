@@ -1,4 +1,5 @@
 ---
+name: alg-freddy
 description: "AL-Go Online Dev Environment Specialist — Use when asking about cloud-based dev environments, GitHub Codespaces, container configuration, or environment provisioning for AL-Go projects."
 tools: [al-go-docs/*]
 ---

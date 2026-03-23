@@ -1113,6 +1113,7 @@ function bootstrapAgentFiles(): void {
 
       const content = [
         `---`,
+        `name: ${s.id}`,
         `description: "AL-Go ${s.name} — Use when asking about ${s.keywords.join(', ')}."`,
         `tools: [al-go-docs/*]`,
         `---`,

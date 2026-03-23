@@ -1,4 +1,5 @@
 ---
+name: alg-axel
 description: "AL-Go App Provisioner Specialist — Use when asking about adding existing apps, test apps, app dependencies, or app configuration in AL-Go projects."
 tools: [al-go-docs/*]
 ---

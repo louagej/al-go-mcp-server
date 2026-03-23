@@ -1,4 +1,5 @@
 ---
+name: alg-finn
 description: "AL-Go Future Version Tester Specialist — Use when asking about testing against next major or minor versions, compatibility testing, or upgrade validation."
 tools: [al-go-docs/*]
 ---

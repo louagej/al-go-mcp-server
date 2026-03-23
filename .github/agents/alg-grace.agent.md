@@ -1,4 +1,5 @@
 ---
+name: alg-grace
 description: "AL-Go App Generator Specialist — Use when asking about creating new BC applications, project scaffolding, app structure, or template configuration."
 tools: [al-go-docs/*]
 ---

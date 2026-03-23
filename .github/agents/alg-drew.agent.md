@@ -1,4 +1,5 @@
 ---
+name: alg-drew
 description: "AL-Go Documentation Publisher Specialist — Use when asking about reference documentation deployment, documentation generation, hosting, or update procedures."
 tools: [al-go-docs/*]
 ---

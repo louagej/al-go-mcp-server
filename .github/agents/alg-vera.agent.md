@@ -1,4 +1,5 @@
 ---
+name: alg-vera
 description: "AL-Go Version Updater Specialist — Use when asking about version number increments, semantic versioning, version files, or app manifest updates."
 tools: [al-go-docs/*]
 ---

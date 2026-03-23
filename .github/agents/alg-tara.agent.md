@@ -1,4 +1,5 @@
 ---
+name: alg-tara
 description: "AL-Go Current Version Test Specialist — Use when asking about test execution, test configuration, test results analysis, or quality assurance for the current version."
 tools: [al-go-docs/*]
 ---
