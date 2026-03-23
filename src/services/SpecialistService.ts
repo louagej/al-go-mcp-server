@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 export interface Specialist {
   id: string;
   persona?: string;
+  avatarUrl?: string;
   name: string;
   description: string;
   expertise: string[];
@@ -129,9 +130,13 @@ export class SpecialistService {
       ? `**${specialist.persona}** — ${specialist.name} (${specialist.id})`
       : `**${specialist.name}** (${specialist.id})`;
 
+    const avatarLine = specialist.avatarUrl
+      ? `\n![${specialist.persona ?? specialist.name}](${specialist.avatarUrl})\n`
+      : '';
+
     return `
 ${header}
-
+${avatarLine}
 ${specialist.description}
 
 **Expertise:**

@@ -22,7 +22,8 @@
     "relatedWorkflows": [
       "CreateOnlineEnvironment.yml"
     ],
-    "persona": "Freddy"
+    "persona": "Freddy",
+    "avatarUrl": "https://api.multiavatar.com/Freddy.svg"
   },
   {
     "id": "release-manager",
@@ -49,7 +50,8 @@
     "relatedWorkflows": [
       "CreateRelease.yml"
     ],
-    "persona": "Riley"
+    "persona": "Riley",
+    "avatarUrl": "https://api.multiavatar.com/Riley.svg"
   },
   {
     "id": "doc-publisher",
@@ -74,7 +76,8 @@
     "relatedWorkflows": [
       "PublishDocumentation.yml"
     ],
-    "persona": "Drew"
+    "persona": "Drew",
+    "avatarUrl": "https://api.multiavatar.com/Drew.svg"
   },
   {
     "id": "version-updater",
@@ -100,7 +103,8 @@
     "relatedWorkflows": [
       "IncrementVersionNumber.yml"
     ],
-    "persona": "Vera"
+    "persona": "Vera",
+    "avatarUrl": "https://api.multiavatar.com/Vera.svg"
   },
   {
     "id": "env-publish",
@@ -126,7 +130,8 @@
     "relatedWorkflows": [
       "PublishToEnvironment.yml"
     ],
-    "persona": "Ethan"
+    "persona": "Ethan",
+    "avatarUrl": "https://api.multiavatar.com/Ethan.svg"
   },
   {
     "id": "test-current",
@@ -152,7 +157,8 @@
     "relatedWorkflows": [
       "TestCurrent.yml"
     ],
-    "persona": "Tara"
+    "persona": "Tara",
+    "avatarUrl": "https://api.multiavatar.com/Tara.svg"
   },
   {
     "id": "app-provisioner",
@@ -179,7 +185,8 @@
     "relatedWorkflows": [
       "AddExistingApp.yml"
     ],
-    "persona": "Axel"
+    "persona": "Axel",
+    "avatarUrl": "https://api.multiavatar.com/Axel.svg"
   },
   {
     "id": "cicd-architect",
@@ -208,7 +215,8 @@
       "CICD.yml",
       "BuildAndTest.yml"
     ],
-    "persona": "Casey"
+    "persona": "Casey",
+    "avatarUrl": "https://api.multiavatar.com/Casey.svg"
   },
   {
     "id": "app-generator",
@@ -234,7 +242,8 @@
     "relatedWorkflows": [
       "CreateApp.yml"
     ],
-    "persona": "Grace"
+    "persona": "Grace",
+    "avatarUrl": "https://api.multiavatar.com/Grace.svg"
   },
   {
     "id": "perf-test-creator",
@@ -259,7 +268,8 @@
     "relatedWorkflows": [
       "CreatePerformanceTestApp.yml"
     ],
-    "persona": "Perry"
+    "persona": "Perry",
+    "avatarUrl": "https://api.multiavatar.com/Perry.svg"
   },
   {
     "id": "test-app-creator",
@@ -284,7 +294,8 @@
     "relatedWorkflows": [
       "CreateTestApp.yml"
     ],
-    "persona": "Tommy"
+    "persona": "Tommy",
+    "avatarUrl": "https://api.multiavatar.com/Tommy.svg"
   },
   {
     "id": "pr-build-engineer",
@@ -310,7 +321,8 @@
       "PullRequestBuild.yml",
       "PullRequest.yml"
     ],
-    "persona": "Blake"
+    "persona": "Blake",
+    "avatarUrl": "https://api.multiavatar.com/Blake.svg"
   },
   {
     "id": "future-tester",
@@ -338,7 +350,8 @@
       "TestNextMajor.yml",
       "TestNextMinor.yml"
     ],
-    "persona": "Finn"
+    "persona": "Finn",
+    "avatarUrl": "https://api.multiavatar.com/Finn.svg"
   },
   {
     "id": "troubleshooter",
@@ -364,7 +377,8 @@
       "Troubleshooting.md"
     ],
     "relatedWorkflows": [],
-    "persona": "Rex"
+    "persona": "Rex",
+    "avatarUrl": "https://api.multiavatar.com/Rex.svg"
   },
   {
     "id": "system-updater",
@@ -390,7 +404,8 @@
     "relatedWorkflows": [
       "UpdateAlGoSystemFiles.yml"
     ],
-    "persona": "Stella"
+    "persona": "Stella",
+    "avatarUrl": "https://api.multiavatar.com/Stella.svg"
   },
   {
     "id": "build-manager",
@@ -415,6 +430,7 @@
     "relatedWorkflows": [
       "Build.yml"
     ],
-    "persona": "Bruno"
+    "persona": "Bruno",
+    "avatarUrl": "https://api.multiavatar.com/Bruno.svg"
   }
 ]
