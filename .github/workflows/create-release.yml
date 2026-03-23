@@ -36,7 +36,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN != '' && secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -184,30 +184,14 @@ jobs:
 
       - name: Commit version bump and changelog
         run: |
-          BRANCH="chore/release-${{ steps.version_bump.outputs.NEW_VERSION }}"
-          git checkout -b "$BRANCH"
           git add package.json package-lock.json CHANGELOG.md
           git commit -m "chore: bump version to ${{ steps.version_bump.outputs.NEW_VERSION }}"
-          echo "RELEASE_BRANCH=$BRANCH" >> $GITHUB_ENV
 
-      - name: Push release branch and tag
-        env:
-          PUSH_TOKEN: ${{ secrets.PAT_TOKEN != '' && secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
+      - name: Create and push tag
         run: |
-          git remote set-url origin https://x-access-token:${PUSH_TOKEN}@github.com/${{ github.repository }}
-          git push origin "$RELEASE_BRANCH"
           git tag ${{ steps.version_bump.outputs.NEW_VERSION }}
+          git push origin main
           git push origin ${{ steps.version_bump.outputs.NEW_VERSION }}
-
-      - name: Create pull request for version bump
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr create \
-            --base main \
-            --head "$RELEASE_BRANCH" \
-            --title "chore: bump version to ${{ steps.version_bump.outputs.NEW_VERSION }}" \
-            --body "Automated version bump and changelog update for release ${{ steps.version_bump.outputs.NEW_VERSION }}."
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
