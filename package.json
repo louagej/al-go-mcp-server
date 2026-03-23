@@ -11,7 +11,8 @@
     "build": "tsc && node build-data.mjs",
     "start": "node build/index.js",
     "dev": "npm run build && node build/index.js",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "test": "node test/test-phase2.mjs && node test/test-functionality.mjs"
   },
   "keywords": [
     "mcp",
