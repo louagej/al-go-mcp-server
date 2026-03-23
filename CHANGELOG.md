@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+
+## [2.5.0] - 2026-03-23
+
+### Added
+- Writes `alg-<persona>.agent.md` for all 16 specialists to the user prompts directory on startup
+- non-fatal if the directory cannot be resolved or written
+
+### Changed
+- `main()` now calls `bootstrapAgentFiles()` immediately after `server.connect()`
+
+### Fixed
+- Resolved compile error in `bootstrapAgentFiles` — replaced out-of-scope `getSpecialistService()` call with `new SpecialistService()`
+
 ## [2.4.0] - 2026-03-23
 
 ### Added

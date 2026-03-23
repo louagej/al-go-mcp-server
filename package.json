@@ -1,6 +1,6 @@
 {
   "name": "al-go-mcp-server",
-  "version": "2.4.0",
+  "version": "2.5.0",
   "description": "MCP server for AL-Go documentation integration",
   "type": "module",
   "main": "./build/index.js",
