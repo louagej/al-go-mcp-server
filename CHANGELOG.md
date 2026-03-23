@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+
+## [2.4.0] - 2026-03-23
+
+### Added
+- 16 VS Code agent files (.github/agents/alg-*.agent.md) enabling @alg- addressing in Copilot Chat for all 16 specialists
+- Each agent displays the specialist avatar at the start of every response
+- Each agent is scoped to al-go-docs/* MCP tools only
+
+### Changed
+- README: added disclaimer that all persona names and avatars are fictional and do not represent any real individual
+
 ## [2.3.0] - 2026-03-23
 
 ### Added
