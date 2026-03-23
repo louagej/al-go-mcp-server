@@ -109,9 +109,9 @@ npx --yes al-go-mcp-server@latest
 
 | Tool | Description |
 |------|-------------|
-| `search-al-go-docs` | Search AL-Go documentation and guides |
-| `get-al-go-workflows` | Get AL-Go workflow templates and examples |
-| `refresh-al-go-cache` | Force refresh of cached documentation |
+| `alg-search-docs` | Search AL-Go documentation and guides |
+| `alg-get-workflows` | Get AL-Go workflow templates and examples |
+| `alg-refresh-cache` | Force refresh of cached documentation |
 
 ### Specialists
 

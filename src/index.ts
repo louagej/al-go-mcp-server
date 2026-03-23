@@ -265,7 +265,7 @@ server.registerResource(
 
 // Tool: Search AL-Go documentation
 server.registerTool(
-  "search-al-go-docs",
+  "alg-search-docs",
   {
     title: "Search AL-Go Documentation",
     description: "Search through AL-Go documentation for specific queries",
@@ -303,7 +303,7 @@ server.registerTool(
 
 // Tool: Get AL-Go workflow examples
 server.registerTool(
-  "get-al-go-workflows",
+  "alg-get-workflows",
   {
     title: "Get AL-Go Workflow Examples",
     description: "Get examples of AL-Go GitHub workflows",
@@ -339,7 +339,7 @@ server.registerTool(
 
 // Tool: Get server version
 server.registerTool(
-  "get-server-version",
+  "alg-get-server-version",
   {
     title: "Get AL-Go MCP Server Version",
     description: "Get version information for the AL-Go MCP server",
@@ -357,7 +357,7 @@ server.registerTool(
 
 // Tool: Refresh documentation cache
 server.registerTool(
-  "refresh-al-go-cache",
+  "alg-refresh-cache",
   {
     title: "Refresh AL-Go Documentation Cache",
     description: "Refresh the cached AL-Go documentation from the repository",

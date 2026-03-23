@@ -21,9 +21,9 @@ Use `#tool-name` syntax to invoke a tool directly.
 ### Documentation
 | Tool | When to use |
 |------|-------------|
-| `#search-al-go-docs` | User asks about AL-Go documentation or guides |
-| `#get-al-go-workflows` | User asks for workflow templates or examples |
-| `#refresh-al-go-cache` | User wants to force-refresh cached docs |
+| `#alg-search-docs` | User asks about AL-Go documentation or guides |
+| `#alg-get-workflows` | User asks for workflow templates or examples |
+| `#alg-refresh-cache` | User wants to force-refresh cached docs |
 
 ### Knowledge sources
 | Tool | When to use |

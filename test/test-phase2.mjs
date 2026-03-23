@@ -150,10 +150,10 @@ console.log('\nTest 6: MCP Tools Registration Check');
 console.log('-'.repeat(60));
 const expectedTools = [
   // Phase 1 — Documentation
-  'search-al-go-docs',
-  'get-al-go-workflows',
-  'get-server-version',
-  'refresh-al-go-cache',
+  'alg-search-docs',
+  'alg-get-workflows',
+  'alg-get-server-version',
+  'alg-refresh-cache',
   // Phase 1 — Specialists
   'alg-search-specialists',
   'alg-list-specialists',
