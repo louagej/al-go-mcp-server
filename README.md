@@ -117,28 +117,28 @@ npx --yes al-go-mcp-server@latest
 
 | Tool | Description |
 |------|-------------|
-| `search-specialists` | Find domain specialists by keyword or expertise area |
-| `list-specialists` | Browse all 16 AL-Go domain specialists |
-| `get-specialist` | Get detailed profile for a specific specialist |
+| `alg-search-specialists` | Find domain specialists by keyword or expertise area |
+| `alg-list-specialists` | Browse all 16 AL-Go domain specialists |
+| `alg-get-specialist` | Get detailed profile for a specific specialist |
 
 ### Knowledge Sources
 
 | Tool | Description |
 |------|-------------|
-| `get-scenarios` | Fetch AL-Go scenario files from the repository |
-| `search-discussions` | Search GitHub Discussions for community Q&A |
-| `search-issues` | Search resolved GitHub Issues for tips and workarounds |
-| `get-specialist-knowledge` | Get all knowledge sources linked to a specialist |
-| `build-knowledge-graph` | Build the complete specialist–knowledge graph |
+| `alg-get-scenarios` | Fetch AL-Go scenario files from the repository |
+| `alg-search-discussions` | Search GitHub Discussions for community Q&A |
+| `alg-search-issues` | Search resolved GitHub Issues for tips and workarounds |
+| `alg-get-specialist-knowledge` | Get all knowledge sources linked to a specialist |
+| `alg-build-knowledge-graph` | Build the complete specialist–knowledge graph |
 
 ### Advanced
 
 | Tool | Description |
 |------|-------------|
-| `semantic-search` | Cross-source intelligent search with relevance ranking |
-| `graph-visualization` | Visualize specialist relationships (JSON or text format) |
-| `cache-stats` | View cache hit/miss rates and TTL configuration |
-| `clear-cache` | Clear all, expired, or source-specific cache entries |
+| `alg-semantic-search` | Cross-source intelligent search with relevance ranking |
+| `alg-graph-visualization` | Visualize specialist relationships (JSON or text format) |
+| `alg-cache-stats` | View cache hit/miss rates and TTL configuration |
+| `alg-clear-cache` | Clear all, expired, or source-specific cache entries |
 
 > **Note**: Tools in the Knowledge Sources and Advanced groups that call the GitHub API require a `GITHUB_TOKEN` to be set for full functionality.
 

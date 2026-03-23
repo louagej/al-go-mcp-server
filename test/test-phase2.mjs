@@ -151,14 +151,14 @@ console.log('-'.repeat(60));
 const expectedTools = [
   'search-al-go-docs',
   'get-al-go-workflows',
-  'search-specialists',
-  'list-specialists',
-  'get-specialist',
-  'search-discussions',
-  'get-scenarios',
-  'search-issues',
-  'get-specialist-knowledge',
-  'build-knowledge-graph'
+  'alg-search-specialists',
+  'alg-list-specialists',
+  'alg-get-specialist',
+  'alg-search-discussions',
+  'alg-get-scenarios',
+  'alg-search-issues',
+  'alg-get-specialist-knowledge',
+  'alg-build-knowledge-graph'
 ];
 
 console.log(`  Expected tools to be registered: ${expectedTools.length}`);
