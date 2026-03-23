@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0] - 2026-03-23
+
+### Added
+- 16 AL-Go domain specialists with mapped expertise, keywords, and related scenarios/workflows (App Generator, Build Manager, CI/CD Architect, Deploy Helper, Release Manager, and 11 more)
+- `search-specialists` tool — find specialists by keyword or expertise area
+- `list-specialists` tool — browse all domain specialists
+- `get-specialist` tool — get full profile for a specific specialist
+- `search-discussions` tool — search GitHub Discussions for community Q&A
+- `get-scenarios` tool — fetch AL-Go scenario files from the repository
+- `search-issues` tool — search resolved GitHub Issues for tips and workarounds
+- `get-specialist-knowledge` tool — retrieve all knowledge sources linked to a specialist
+- `build-knowledge-graph` tool — build the complete specialist–knowledge graph
+- `semantic-search` tool — cross-source intelligent search with TF-IDF relevance ranking
+- `graph-visualization` tool — visualize specialist relationships in JSON or text format
+- `cache-stats` tool — view cache hit/miss rates and per-source TTL configuration
+- `clear-cache` tool — clear all, expired, or source-specific cache entries
+- Automated tests in `test/` that run on every CI build and pull request
+
+### Changed
+- Extended `AlGoService` with scenario, workshop, and issue fetching methods
+- Caching now uses configurable per-source TTLs (workshop/scenario: 24 h, discussion: 6 h, issue: 12 h)
+- Release workflow supports `Added`, `Changed`, and `Fixed` changelog sections instead of a single one-liner
+- GitHub Release creation migrated from deprecated `actions/create-release@v1` to `softprops/action-gh-release@v2`
+- README updated to document all 14 tools, specialist list, and authentication requirements
+
 ## [1.1.0] - 2025-12-22
 
 ### Changed

@@ -6,15 +6,23 @@ on:
       version_type:
         description: 'Version bump type'
         required: true
-        default: 'patch'
+        default: 'minor'
         type: choice
         options:
           - patch
           - minor
           - major
-      changelog_entry:
-        description: 'Changelog entry (brief description of changes)'
-        required: true
+      added:
+        description: 'New features — separate multiple items with ;'
+        required: false
+        type: string
+      changed:
+        description: 'Changes to existing functionality — separate multiple items with ;'
+        required: false
+        type: string
+      fixed:
+        description: 'Bug fixes — separate multiple items with ;'
+        required: false
         type: string
 
 jobs:
@@ -23,99 +31,138 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-      
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
         with:
           token: ${{ secrets.PAT_TOKEN || secrets.GITHUB_TOKEN }}
-          
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Configure git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          
+
       - name: Get current version
         id: current_version
         run: echo "VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-        
+
       - name: Bump version
         id: version_bump
         run: |
           NEW_VERSION=$(npm version ${{ github.event.inputs.version_type }} --no-git-tag-version)
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_OUTPUT
           echo "Bumped from ${{ steps.current_version.outputs.VERSION }} to ${NEW_VERSION}"
-          
-      - name: Update changelog
+
+      - name: Update changelog and build release notes
+        env:
+          NEW_VERSION: ${{ steps.version_bump.outputs.NEW_VERSION }}
+          ADDED: ${{ github.event.inputs.added }}
+          CHANGED: ${{ github.event.inputs.changed }}
+          FIXED: ${{ github.event.inputs.fixed }}
         run: |
-          DATE=$(date +%Y-%m-%d)
-          NEW_VERSION="${{ steps.version_bump.outputs.NEW_VERSION }}"
-          CHANGELOG_ENTRY="${{ github.event.inputs.changelog_entry }}"
-          
-          # Create temporary file with new entry
-          cat > temp_changelog.md << EOF
-          # Changelog
-          
-          All notable changes to this project will be documented in this file.
-          
-          The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-          and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-          
-          ## [${NEW_VERSION#v}] - ${DATE}
-          
-          ### Changed
-          - ${CHANGELOG_ENTRY}
-          
-          EOF
-          
-          # Append rest of changelog (skip header)
-          tail -n +8 CHANGELOG.md >> temp_changelog.md
-          mv temp_changelog.md CHANGELOG.md
-          
+          node << 'NODESCRIPT'
+          const fs = require('fs');
+
+          const version = process.env.NEW_VERSION.replace('v', '');
+          const date = new Date().toISOString().split('T')[0];
+          const added   = process.env.ADDED   || '';
+          const changed = process.env.CHANGED || '';
+          const fixed   = process.env.FIXED   || '';
+
+          function buildSection(title, input) {
+            if (!input.trim()) return '';
+            const items = input.split(';').map(s => s.trim()).filter(Boolean);
+            if (!items.length) return '';
+            return `\n### ${title}\n` + items.map(i => `- ${i}`).join('\n') + '\n';
+          }
+
+          const sections =
+            buildSection('Added',   added) +
+            buildSection('Changed', changed) +
+            buildSection('Fixed',   fixed);
+
+          const newEntry = `## [${version}] - ${date}\n${sections}`;
+
+          // Insert the new entry before the first existing version block,
+          // unless an entry for this version is already present (manually pre-written).
+          const changelog = fs.readFileSync('CHANGELOG.md', 'utf8');
+          let releaseBody;
+
+          if (changelog.includes(`## [${version}]`)) {
+            console.log(`CHANGELOG.md already contains [${version}] — skipping auto-insert.`);
+            // Extract the existing entry to use in the GitHub Release body
+            const entryStart = changelog.indexOf(`## [${version}]`);
+            const nextEntry  = changelog.indexOf('\n## [', entryStart + 1);
+            const entryText  = nextEntry === -1
+              ? changelog.slice(entryStart).trim()
+              : changelog.slice(entryStart, nextEntry).trim();
+            releaseBody = entryText.split('\n').slice(1).join('\n').trim();
+          } else {
+            if (!added.trim() && !changed.trim() && !fixed.trim()) {
+              console.error("ERROR: At least one of 'added', 'changed', or 'fixed' must be provided.");
+              process.exit(1);
+            }
+            const insertAt = changelog.indexOf('\n## [');
+            const updated  = insertAt === -1
+              ? changelog.trimEnd() + '\n\n' + newEntry + '\n'
+              : changelog.slice(0, insertAt) + '\n\n' + newEntry + '\n' + changelog.slice(insertAt + 1);
+            fs.writeFileSync('CHANGELOG.md', updated);
+            console.log(`CHANGELOG.md updated with [${version}] entry.`);
+            releaseBody = sections.trim();
+          }
+
+          // Generate GitHub Release body
+          const releaseNotes = [
+            `## What's New in v${version}`,
+            '',
+            releaseBody,
+            '',
+            '---',
+            '',
+            'See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for the full version history.',
+            '',
+            '## Installation',
+            '',
+            '```bash',
+            'npx al-go-mcp-server',
+            '```',
+            '',
+            'Or install a specific version:',
+            '',
+            '```bash',
+            `npm install -g al-go-mcp-server@${version}`,
+            '```',
+          ].join('\n');
+          fs.writeFileSync('release_notes.md', releaseNotes);
+          console.log('release_notes.md generated.');
+          NODESCRIPT
+
       - name: Commit version bump and changelog
         run: |
-          git add package.json CHANGELOG.md
-          git commit -m "chore: bump version to ${{ steps.version_bump.outputs.NEW_VERSION }} and update changelog"
-          
+          git add package.json package-lock.json CHANGELOG.md
+          git commit -m "chore: bump version to ${{ steps.version_bump.outputs.NEW_VERSION }}"
+
       - name: Create and push tag
         run: |
           git tag ${{ steps.version_bump.outputs.NEW_VERSION }}
           git push origin main
           git push origin ${{ steps.version_bump.outputs.NEW_VERSION }}
-          
+
       - name: Create GitHub Release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version_bump.outputs.NEW_VERSION }}
-          release_name: Release ${{ steps.version_bump.outputs.NEW_VERSION }}
-          body: |
-            ## Changes in ${{ steps.version_bump.outputs.NEW_VERSION }}
-            
-            ${{ github.event.inputs.changelog_entry }}
-            
-            See [CHANGELOG.md](CHANGELOG.md) for full details.
-            
-            ## Installation
-            
-            ```bash
-            npx al-go-mcp-server
-            ```
-            
-            Or install globally:
-            
-            ```bash
-            npm install -g al-go-mcp-server@${{ steps.version_bump.outputs.NEW_VERSION }}
-            ```
+          name: Release ${{ steps.version_bump.outputs.NEW_VERSION }}
+          body_path: release_notes.md
           draft: false
           prerelease: false

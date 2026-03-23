@@ -8,10 +8,11 @@
     "al-go-mcp-server": "build/index.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node build-data.mjs",
     "start": "node build/index.js",
-    "dev": "tsc && node build/index.js",
-    "watch": "tsc --watch"
+    "dev": "npm run build && node build/index.js",
+    "watch": "tsc --watch",
+    "test": "node test/test-phase2.mjs && node test/test-functionality.mjs"
   },
   "keywords": [
     "mcp",
