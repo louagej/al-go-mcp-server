@@ -146,24 +146,24 @@ npx --yes al-go-mcp-server@latest
 
 The server includes 16 AL-Go domain specialists, each with mapped expertise, keywords, related scenarios, and related workflows:
 
-| Specialist | Focus Area |
-|------------|------------|
-| App Generator Specialist | Create new BC applications from templates |
-| App Provisioner Specialist | Add and manage existing or test applications |
-| Build Manager Specialist | Manage AL-Go project builds and configurations |
-| CI/CD Architect Specialist | Configure and optimize CI/CD pipelines |
-| Current Version Test Specialist | Run and manage tests against the current version |
-| Documentation Publisher Specialist | Deploy and manage reference documentation |
-| Environment Publisher Specialist | Publish Business Central apps to environments |
-| Future Version Tester Specialist | Test applications against next major/minor versions |
-| Online Dev Environment Specialist | Create and manage cloud-based dev environments |
-| Performance Test Creator Specialist | Create and manage performance test applications |
-| PR Build Engineer Specialist | Manage pull request build workflows and validation |
-| Release Manager Specialist | Handle release creation and versioning strategies |
-| System File Updater Specialist | Update and maintain AL-Go system files |
-| Test App Creator Specialist | Create test applications for quality assurance |
-| Troubleshooting Specialist | Diagnose and resolve AL-Go issues and problems |
-| Version Updater Specialist | Manage version number increments and semantic versioning |
+| Persona | Specialist | Focus Area |
+|---------|------------|------------|
+| Freddy | Online Dev Environment Specialist | Create and manage cloud-based dev environments |
+| Riley | Release Manager Specialist | Handle release creation and versioning strategies |
+| Drew | Documentation Publisher Specialist | Deploy and manage reference documentation |
+| Vera | Version Updater Specialist | Manage version number increments and semantic versioning |
+| Ethan | Environment Publisher Specialist | Publish Business Central apps to environments |
+| Tara | Current Version Test Specialist | Run and manage tests against the current version |
+| Axel | App Provisioner Specialist | Add and manage existing or test applications |
+| Casey | CI/CD Architect Specialist | Configure and optimize CI/CD pipelines |
+| Grace | App Generator Specialist | Create new BC applications from templates |
+| Perry | Performance Test Creator Specialist | Create and manage performance test applications |
+| Tommy | Test App Creator Specialist | Create test applications for quality assurance |
+| Blake | PR Build Engineer Specialist | Manage pull request build workflows and validation |
+| Finn | Future Version Tester Specialist | Test applications against next major/minor versions |
+| Rex | Troubleshooting Specialist | Diagnose and resolve AL-Go issues and problems |
+| Stella | System File Updater Specialist | Update and maintain AL-Go system files |
+| Bruno | Build Manager Specialist | Manage AL-Go project builds and configurations |
 
 ## Development
 

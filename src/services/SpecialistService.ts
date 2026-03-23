@@ -7,6 +7,7 @@ import { fileURLToPath } from "url";
  */
 export interface Specialist {
   id: string;
+  persona?: string;
   name: string;
   description: string;
   expertise: string[];
@@ -64,11 +65,12 @@ export class SpecialistService {
 
     return this.specialists.filter(specialist => {
       const matchesName = specialist.name.toLowerCase().includes(lowerQuery);
+      const matchesPersona = specialist.persona?.toLowerCase().includes(lowerQuery) ?? false;
       const matchesDescription = specialist.description.toLowerCase().includes(lowerQuery);
       const matchesExpertise = specialist.expertise.some(e => e.toLowerCase().includes(lowerQuery));
       const matchesKeywords = specialist.keywords.some(k => k.toLowerCase().includes(lowerQuery));
 
-      return matchesName || matchesDescription || matchesExpertise || matchesKeywords;
+      return matchesName || matchesPersona || matchesDescription || matchesExpertise || matchesKeywords;
     });
   }
 
@@ -123,8 +125,12 @@ export class SpecialistService {
    * Format specialist for display
    */
   formatSpecialist(specialist: Specialist): string {
+    const header = specialist.persona
+      ? `**${specialist.persona}** — ${specialist.name} (${specialist.id})`
+      : `**${specialist.name}** (${specialist.id})`;
+
     return `
-**${specialist.name}** (${specialist.id})
+${header}
 
 ${specialist.description}
 
@@ -148,7 +154,10 @@ ${specialist.expertise.map(e => `- ${e}`).join('\n')}
     }
 
     return specialists
-      .map((s, idx) => `${idx + 1}. **${s.name}**: ${s.description}`)
+      .map((s, idx) => {
+        const label = s.persona ? `**${s.persona}** (${s.name})` : `**${s.name}**`;
+        return `${idx + 1}. ${label}: ${s.description}`;
+      })
       .join('\n\n');
   }
 }

@@ -9,13 +9,20 @@
       "Container configuration",
       "Environment provisioning"
     ],
-    "keywords": ["dev environment", "codespaces", "cloud", "online", "setup"],
+    "keywords": [
+      "dev environment",
+      "codespaces",
+      "cloud",
+      "online",
+      "setup"
+    ],
     "relatedScenarios": [
       "Online development environment.md"
     ],
     "relatedWorkflows": [
       "CreateOnlineEnvironment.yml"
-    ]
+    ],
+    "persona": "Freddy"
   },
   {
     "id": "release-manager",
@@ -28,14 +35,21 @@
       "Deployment coordination",
       "Release workflows"
     ],
-    "keywords": ["release", "version", "deployment", "publish", "increment"],
+    "keywords": [
+      "release",
+      "version",
+      "deployment",
+      "publish",
+      "increment"
+    ],
     "relatedScenarios": [
       "CreateRelease.md",
       "IncrementVersionNumber.md"
     ],
     "relatedWorkflows": [
       "CreateRelease.yml"
-    ]
+    ],
+    "persona": "Riley"
   },
   {
     "id": "doc-publisher",
@@ -47,13 +61,20 @@
       "Update procedures",
       "Reference docs"
     ],
-    "keywords": ["documentation", "docs", "reference", "publish", "deploy docs"],
+    "keywords": [
+      "documentation",
+      "docs",
+      "reference",
+      "publish",
+      "deploy docs"
+    ],
     "relatedScenarios": [
       "DeployReferenceDocumentation.md"
     ],
     "relatedWorkflows": [
       "PublishDocumentation.yml"
-    ]
+    ],
+    "persona": "Drew"
   },
   {
     "id": "version-updater",
@@ -66,13 +87,20 @@
       "Version files",
       "App manifest updates"
     ],
-    "keywords": ["version", "increment", "semantic", "versioning", "app.json"],
+    "keywords": [
+      "version",
+      "increment",
+      "semantic",
+      "versioning",
+      "app.json"
+    ],
     "relatedScenarios": [
       "IncrementVersionNumber.md"
     ],
     "relatedWorkflows": [
       "IncrementVersionNumber.yml"
-    ]
+    ],
+    "persona": "Vera"
   },
   {
     "id": "env-publish",
@@ -85,13 +113,20 @@
       "Publishing targets",
       "Tenant management"
     ],
-    "keywords": ["publish", "environment", "deployment", "tenant", "app publish"],
+    "keywords": [
+      "publish",
+      "environment",
+      "deployment",
+      "tenant",
+      "app publish"
+    ],
     "relatedScenarios": [
       "PublishToEnvironment.md"
     ],
     "relatedWorkflows": [
       "PublishToEnvironment.yml"
-    ]
+    ],
+    "persona": "Ethan"
   },
   {
     "id": "test-current",
@@ -104,13 +139,20 @@
       "Quality assurance",
       "Current version testing"
     ],
-    "keywords": ["test", "testing", "current", "quality", "validation"],
+    "keywords": [
+      "test",
+      "testing",
+      "current",
+      "quality",
+      "validation"
+    ],
     "relatedScenarios": [
       "TestCurrentVersion.md"
     ],
     "relatedWorkflows": [
       "TestCurrent.yml"
-    ]
+    ],
+    "persona": "Tara"
   },
   {
     "id": "app-provisioner",
@@ -123,14 +165,21 @@
       "App dependencies",
       "App configuration"
     ],
-    "keywords": ["app", "provisioner", "existing app", "test app", "dependency"],
+    "keywords": [
+      "app",
+      "provisioner",
+      "existing app",
+      "test app",
+      "dependency"
+    ],
     "relatedScenarios": [
       "AddExistingTestApp.md",
       "AddExistingAppOrTestApp.md"
     ],
     "relatedWorkflows": [
       "AddExistingApp.yml"
-    ]
+    ],
+    "persona": "Axel"
   },
   {
     "id": "cicd-architect",
@@ -144,7 +193,13 @@
       "Deployment strategies",
       "GitHub Actions"
     ],
-    "keywords": ["cicd", "pipeline", "automation", "build", "integration"],
+    "keywords": [
+      "cicd",
+      "pipeline",
+      "automation",
+      "build",
+      "integration"
+    ],
     "relatedScenarios": [
       "CiCdPipeline.md",
       "ContinuousIntegration.md"
@@ -152,7 +207,8 @@
     "relatedWorkflows": [
       "CICD.yml",
       "BuildAndTest.yml"
-    ]
+    ],
+    "persona": "Casey"
   },
   {
     "id": "app-generator",
@@ -165,13 +221,20 @@
       "Template configuration",
       "App initialization"
     ],
-    "keywords": ["create", "app", "generator", "new", "scaffold"],
+    "keywords": [
+      "create",
+      "app",
+      "generator",
+      "new",
+      "scaffold"
+    ],
     "relatedScenarios": [
       "CreateNewApp.md"
     ],
     "relatedWorkflows": [
       "CreateApp.yml"
-    ]
+    ],
+    "persona": "Grace"
   },
   {
     "id": "perf-test-creator",
@@ -184,13 +247,19 @@
       "Performance metrics",
       "Benchmarking"
     ],
-    "keywords": ["performance", "perf test", "load test", "benchmark"],
+    "keywords": [
+      "performance",
+      "perf test",
+      "load test",
+      "benchmark"
+    ],
     "relatedScenarios": [
       "CreateNewPerformanceTestApp.md"
     ],
     "relatedWorkflows": [
       "CreatePerformanceTestApp.yml"
-    ]
+    ],
+    "persona": "Perry"
   },
   {
     "id": "test-app-creator",
@@ -203,13 +272,19 @@
       "Test frameworks",
       "Quality assurance"
     ],
-    "keywords": ["test app", "create test", "testing", "qa"],
+    "keywords": [
+      "test app",
+      "create test",
+      "testing",
+      "qa"
+    ],
     "relatedScenarios": [
       "CreateNewTestApp.md"
     ],
     "relatedWorkflows": [
       "CreateTestApp.yml"
-    ]
+    ],
+    "persona": "Tommy"
   },
   {
     "id": "pr-build-engineer",
@@ -222,14 +297,20 @@
       "PR checks",
       "Code quality gates"
     ],
-    "keywords": ["pull request", "pr", "build", "validation"],
+    "keywords": [
+      "pull request",
+      "pr",
+      "build",
+      "validation"
+    ],
     "relatedScenarios": [
       "PullRequestBuild.md"
     ],
     "relatedWorkflows": [
       "PullRequestBuild.yml",
       "PullRequest.yml"
-    ]
+    ],
+    "persona": "Blake"
   },
   {
     "id": "future-tester",
@@ -242,7 +323,13 @@
       "Compatibility testing",
       "Upgrade validation"
     ],
-    "keywords": ["test next", "future", "major", "minor", "compatibility"],
+    "keywords": [
+      "test next",
+      "future",
+      "major",
+      "minor",
+      "compatibility"
+    ],
     "relatedScenarios": [
       "TestNextMajor.md",
       "TestNextMinor.md"
@@ -250,7 +337,8 @@
     "relatedWorkflows": [
       "TestNextMajor.yml",
       "TestNextMinor.yml"
-    ]
+    ],
+    "persona": "Finn"
   },
   {
     "id": "troubleshooter",
@@ -264,11 +352,19 @@
       "Issue resolution",
       "Best practices"
     ],
-    "keywords": ["troubleshooting", "troubleshoot", "issue", "problem", "error", "debug"],
+    "keywords": [
+      "troubleshooting",
+      "troubleshoot",
+      "issue",
+      "problem",
+      "error",
+      "debug"
+    ],
     "relatedScenarios": [
       "Troubleshooting.md"
     ],
-    "relatedWorkflows": []
+    "relatedWorkflows": [],
+    "persona": "Rex"
   },
   {
     "id": "system-updater",
@@ -281,13 +377,20 @@
       "Settings management",
       "System maintenance"
     ],
-    "keywords": ["update", "system", "files", "maintain", "upgrade"],
+    "keywords": [
+      "update",
+      "system",
+      "files",
+      "maintain",
+      "upgrade"
+    ],
     "relatedScenarios": [
       "UpdateAlGoSystemFiles.md"
     ],
     "relatedWorkflows": [
       "UpdateAlGoSystemFiles.yml"
-    ]
+    ],
+    "persona": "Stella"
   },
   {
     "id": "build-manager",
@@ -300,12 +403,18 @@
       "Build output",
       "Build artifacts"
     ],
-    "keywords": ["build", "build al-go", "compilation", "artifacts"],
+    "keywords": [
+      "build",
+      "build al-go",
+      "compilation",
+      "artifacts"
+    ],
     "relatedScenarios": [
       "BuildAlGoProject.md"
     ],
     "relatedWorkflows": [
       "Build.yml"
-    ]
+    ],
+    "persona": "Bruno"
   }
 ]
