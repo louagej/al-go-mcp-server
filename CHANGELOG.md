@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+
+## [2.3.0] - 2026-03-23
+
+### Added
+- None
+
+### Changed
+- Rename specialist IDs to persona-based handles (`@alg-freddy`, `@alg-casey`, ...)
+
+### Fixed
+- None
+
 ## [2.2.0] - 2026-03-23
 
 ### Added
