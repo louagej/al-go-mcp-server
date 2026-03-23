@@ -1,72 +1,34 @@
-## Description
+## Summary
 
-Brief description of changes made in this PR.
-
-## Type of Change
-
-- [ ] 🐛 Bug fix (non-breaking change which fixes an issue)
-- [ ] ✨ New feature (non-breaking change which adds functionality)
-- [ ] 💥 Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] 📚 Documentation update
-- [ ] 🔧 Maintenance (dependency updates, code cleanup, etc.)
+Brief description of what this PR does.
 
 ## Related Issues
 
 - Fixes #(issue number)
 - Related to #(issue number)
 
-## Changes Made
+---
 
-- Change 1
-- Change 2
-- Change 3
+<!-- 
+  The sections below feed directly into the Create Release workflow.
+  Fill in only the sections that apply — leave empty sections blank or remove them.
+  Each bullet becomes one line in the CHANGELOG and GitHub Release notes.
+-->
 
-## Testing
+### Added
+- 
 
-- [ ] ✅ Built successfully (`npm run build`)
-- [ ] ✅ Tests pass (`npm test`)
-- [ ] ✅ Manual testing completed
-- [ ] ✅ No breaking changes introduced
+### Changed
+- 
 
-### Test Steps
+### Fixed
+- 
 
-1. Step 1
-2. Step 2
-3. Step 3
-
-## Screenshots (if applicable)
-
-Add screenshots to help explain your changes.
-
-## Security Considerations
-
-- [ ] 📋 No sensitive information committed (API keys, secrets, etc.)
-- [ ] 🔒 Security implications reviewed
-- [ ] 🛡️ Input validation added where appropriate
-- [ ] 📝 Security-related changes documented
-
-## Documentation
-
-- [ ] 📖 README updated (if applicable)
-- [ ] 📋 CONTRIBUTING.md updated (if applicable)
-- [ ] 💬 Code comments added for complex logic
-- [ ] 📚 API documentation updated (if applicable)
-
-## Dependencies
-
-- [ ] 🔄 No new dependencies added
-- [ ] ✅ New dependencies justified and secure
-- [ ] 📦 Package.json updated appropriately
+---
 
 ## Checklist
 
-- [ ] 🔍 Self-review completed
-- [ ] 📝 Code follows project style guidelines
-- [ ] 🧹 No commented-out code or debug statements
-- [ ] 🚫 No sensitive information exposed
-- [ ] 📋 Related documentation updated
-- [ ] 🔗 Linked to relevant issues
-
-## Notes for Reviewers
-
-Any additional context or notes for reviewers...
+- [ ] ✅ Built successfully (`npm run build`)
+- [ ] ✅ Tests pass (`node test/test-functionality.mjs && node test/test-phase2.mjs`)
+- [ ] ✅ No sensitive information committed
+- [ ] ✅ README updated (if applicable)
