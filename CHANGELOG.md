@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+
+## [2.1.0] - 2026-03-23
+
+### Added
+- Persona names for all 16 specialists (Freddy, Riley, Drew, Vera, Ethan, Tara, Axel, Casey, Grace, Perry, Tommy, Blake, Finn, Rex, Stella, Bruno) — inspired by the AL-Go community, with Freddy honouring the AL-Go founder
+- DiceBear avatar for every specialist, rendered in tool responses and the README
+- `alg-ask` tool — address any specialist by persona name in chat (e.g. `alg-freddy my dev environment can't be reached`), response opens with avatar and expertise context
+- `alg-` prefix added to all 16 specialist IDs for namespace consistency with tool naming
+- Sample chat message column added to the Domain Specialists table in README
+
+### Changed
+- All 12 generic tool names prefixed with `alg-` to prevent conflicts with other MCP servers such as bc-code-intel that register tools with the same names
+- `alg-search-specialists` now also matches on persona name
+- Domain Specialists table in README now shows avatar, name, specialist role, focus area, and a sample chat prompt per row
+- Test suite expanded from 10 to all 17 registered tools, grouped by phase
+
+### Fixed
+- Switched avatar source from Multiavatar SVG (blocked by GitHub Content Security Policy) to DiceBear PNG which renders reliably in GitHub Markdown
+- `alg-search-specialists` description now correctly lists persona as a searchable field
+- CHANGELOG v2.0.0 entries updated to use the correct `alg-*` tool names
+
 ## [2.0.0] - 2026-03-23
 
 ### Added
