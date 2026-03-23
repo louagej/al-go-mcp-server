@@ -1050,11 +1050,88 @@ Use the AL-Go documentation and examples available through the MCP tools to prov
     // Start the server with stdio transport
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    
+    bootstrapAgentFiles();
     console.error(`AL-Go MCP Server v${packageJson.version} is running on stdio`);
   } catch (error) {
     console.error("Failed to start AL-Go MCP Server:", error);
     process.exit(1);
+  }
+}
+
+/**
+ * Detect the VS Code user prompts directory cross-platform.
+ * Agent files written here are available globally in all workspaces without touching any project.
+ */
+function getVSCodePromptsDir(): string | undefined {
+  const home = process.env.HOME || process.env.USERPROFILE || '';
+  const candidates: string[] = [];
+
+  if (process.platform === 'win32') {
+    const appData = process.env.APPDATA || path.join(home, 'AppData', 'Roaming');
+    candidates.push(
+      path.join(appData, 'Code', 'User', 'prompts'),
+      path.join(appData, 'Code - Insiders', 'User', 'prompts'),
+    );
+  } else if (process.platform === 'darwin') {
+    candidates.push(
+      path.join(home, 'Library', 'Application Support', 'Code', 'User', 'prompts'),
+      path.join(home, 'Library', 'Application Support', 'Code - Insiders', 'User', 'prompts'),
+    );
+  } else {
+    candidates.push(
+      path.join(home, '.config', 'Code', 'User', 'prompts'),
+      path.join(home, '.config', 'Code - Insiders', 'User', 'prompts'),
+    );
+  }
+
+  // Return the first candidate whose parent (...\User\) already exists
+  return candidates.find(p => fs.existsSync(path.dirname(p)));
+}
+
+/**
+ * Write AL-Go specialist agent files into the VS Code user prompts directory
+ * at server startup, so @alg-* agents are available in Copilot Chat agent mode
+ * across all workspaces without touching any project folder.
+ */
+function bootstrapAgentFiles(): void {
+  try {
+    const promptsDir = getVSCodePromptsDir();
+    if (!promptsDir) {
+      console.error('AL-Go MCP Server: Could not locate VS Code user directory — skipping agent bootstrap');
+      return;
+    }
+
+    fs.mkdirSync(promptsDir, { recursive: true });
+
+    const specialists = new SpecialistService().getAll();
+    let count = 0;
+
+    for (const s of specialists) {
+      const persona = s.persona ?? s.name;
+      const personaLower = persona.toLowerCase();
+      const filePath = path.join(promptsDir, `${s.id}.agent.md`);
+
+      const content = [
+        `---`,
+        `description: "AL-Go ${s.name} — Use when asking about ${s.keywords.join(', ')}."`,
+        `tools: [al-go-docs/*]`,
+        `---`,
+        `You are **${persona}**, the AL-Go ${s.name}.`,
+        ``,
+        `Always start by calling \`#alg-ask\` with \`specialist="${personaLower}"\` and the user's question to get your expert context, then answer using that context.`,
+        ``,
+        `## Expertise`,
+        s.expertise.map((e: string) => `- ${e}`).join('\n'),
+      ].join('\n');
+
+      fs.writeFileSync(filePath, content, 'utf8');
+      count++;
+    }
+
+    console.error(`AL-Go MCP Server: Bootstrapped ${count} specialist agents to ${promptsDir}`);
+  } catch (err) {
+    // Non-fatal — server still works without the agent files
+    console.error(`AL-Go MCP Server: Agent bootstrap failed — ${err instanceof Error ? err.message : err}`);
   }
 }
 
