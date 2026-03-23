@@ -44,9 +44,9 @@ try {
   const appResults = specialistService.getByKeyword('app');
   console.log(`  Specialists with "app" keyword: ${appResults.length}`);
 
-  const cicdSpecialist = specialistService.getById('alg-cicd-architect');
+  const cicdSpecialist = specialistService.getById('alg-casey');
   if (cicdSpecialist) {
-    const related = specialistService.getRelated('alg-cicd-architect');
+    const related = specialistService.getRelated('alg-casey');
     console.log(`  Related to CICD Architect: ${related.length} specialist(s)`);
     if (related.length > 0) {
       console.log(`    → ${related[0].name}`);

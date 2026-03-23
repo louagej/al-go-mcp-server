@@ -24,14 +24,14 @@ console.log('-'.repeat(70));
 try {
   const specialistService = new SpecialistService();
 
-  const appGen = specialistService.getById('alg-app-generator');
+  const appGen = specialistService.getById('alg-grace');
   if (appGen) {
     const formatted = specialistService.formatSpecialist(appGen);
     console.log('  Formatted output:\n');
     console.log('  ' + formatted.split('\n').join('\n  '));
     pass('Specialist formatting working correctly');
   } else {
-    fail('Specialist "alg-app-generator" not found');
+    fail('Specialist "alg-grace" not found');
   }
 } catch (error) {
   fail('Specialist formatting', error);
@@ -62,9 +62,9 @@ console.log('-'.repeat(70));
 try {
   const specialistService = new SpecialistService();
 
-  const testAppCreator = specialistService.getById('alg-test-app-creator');
+  const testAppCreator = specialistService.getById('alg-tommy');
   if (testAppCreator) {
-    const related = specialistService.getRelated('alg-test-app-creator');
+    const related = specialistService.getRelated('alg-tommy');
 
     console.log(`  Test App Creator is related to ${related.length} specialist(s):\n`);
     related.forEach((s, idx) => {
@@ -75,7 +75,7 @@ try {
 
     pass('Specialist relationships working correctly');
   } else {
-    fail('Specialist "alg-test-app-creator" not found');
+    fail('Specialist "alg-tommy" not found');
   }
 } catch (error) {
   fail('Specialist relationships', error);

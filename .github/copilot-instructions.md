@@ -44,28 +44,28 @@ Use `#tool-name` syntax to invoke a tool directly.
 
 ## Addressing specialists by persona name
 
-Each specialist has a persona first name. When the user writes `alg-<persona> <question>`, call `#alg-ask` immediately with the persona name and the question. **Do not call bc-code-intel tools.**
+Each specialist has a persona first name. When the user writes `@alg-<persona> <question>` or `alg-<persona> <question>`, call `#alg-ask` immediately with the persona name and the question. **Do not call bc-code-intel tools.**
 
-| Persona | Specialist |
-|---------|-----------|
-| `alg-freddy` | Online Dev Environment Specialist |
-| `alg-riley` | Release Manager Specialist |
-| `alg-drew` | Documentation Publisher Specialist |
-| `alg-vera` | Version Updater Specialist |
-| `alg-ethan` | Environment Publisher Specialist |
-| `alg-tara` | Current Version Test Specialist |
-| `alg-axel` | App Provisioner Specialist |
-| `alg-casey` | CI/CD Architect Specialist |
-| `alg-grace` | App Generator Specialist |
-| `alg-perry` | Performance Test Creator Specialist |
-| `alg-tommy` | Test App Creator Specialist |
-| `alg-blake` | PR Build Engineer Specialist |
-| `alg-finn` | Future Version Tester Specialist |
-| `alg-rex` | Troubleshooting Specialist |
-| `alg-stella` | System File Updater Specialist |
-| `alg-bruno` | Build Manager Specialist |
+| Handle | Specialist |
+|--------|-----------|
+| `@alg-freddy` | Online Dev Environment Specialist |
+| `@alg-riley` | Release Manager Specialist |
+| `@alg-drew` | Documentation Publisher Specialist |
+| `@alg-vera` | Version Updater Specialist |
+| `@alg-ethan` | Environment Publisher Specialist |
+| `@alg-tara` | Current Version Test Specialist |
+| `@alg-axel` | App Provisioner Specialist |
+| `@alg-casey` | CI/CD Architect Specialist |
+| `@alg-grace` | App Generator Specialist |
+| `@alg-perry` | Performance Test Creator Specialist |
+| `@alg-tommy` | Test App Creator Specialist |
+| `@alg-blake` | PR Build Engineer Specialist |
+| `@alg-finn` | Future Version Tester Specialist |
+| `@alg-rex` | Troubleshooting Specialist |
+| `@alg-stella` | System File Updater Specialist |
+| `@alg-bruno` | Build Manager Specialist |
 
 ### Example
-User types: `alg-freddy my codespace won't start after the latest AL-Go update`
+User types: `@alg-freddy my codespace won't start after the latest AL-Go update`
 → Call `#alg-ask specialist="freddy" question="my codespace won't start after the latest AL-Go update"`
 → Freddy responds with his avatar and expertise context, then answer the question using that context.
