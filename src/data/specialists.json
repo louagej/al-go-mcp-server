@@ -1,6 +1,6 @@
 [
   {
-    "id": "online-dev-env",
+    "id": "alg-online-dev-env",
     "name": "Online Dev Environment Specialist",
     "description": "Create and manage cloud-based development environments for AL-Go projects",
     "expertise": [
@@ -9,16 +9,24 @@
       "Container configuration",
       "Environment provisioning"
     ],
-    "keywords": ["dev environment", "codespaces", "cloud", "online", "setup"],
+    "keywords": [
+      "dev environment",
+      "codespaces",
+      "cloud",
+      "online",
+      "setup"
+    ],
     "relatedScenarios": [
       "Online development environment.md"
     ],
     "relatedWorkflows": [
       "CreateOnlineEnvironment.yml"
-    ]
+    ],
+    "persona": "Freddy",
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Freddy&size=80"
   },
   {
-    "id": "release-manager",
+    "id": "alg-release-manager",
     "name": "Release Manager Specialist",
     "description": "Handle release creation, versioning strategies, and deployment coordination",
     "expertise": [
@@ -28,17 +36,25 @@
       "Deployment coordination",
       "Release workflows"
     ],
-    "keywords": ["release", "version", "deployment", "publish", "increment"],
+    "keywords": [
+      "release",
+      "version",
+      "deployment",
+      "publish",
+      "increment"
+    ],
     "relatedScenarios": [
       "CreateRelease.md",
       "IncrementVersionNumber.md"
     ],
     "relatedWorkflows": [
       "CreateRelease.yml"
-    ]
+    ],
+    "persona": "Riley",
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Riley&size=80"
   },
   {
-    "id": "doc-publisher",
+    "id": "alg-doc-publisher",
     "name": "Documentation Publisher Specialist",
     "description": "Deploy and manage reference documentation for Business Central extensions",
     "expertise": [
@@ -47,16 +63,24 @@
       "Update procedures",
       "Reference docs"
     ],
-    "keywords": ["documentation", "docs", "reference", "publish", "deploy docs"],
+    "keywords": [
+      "documentation",
+      "docs",
+      "reference",
+      "publish",
+      "deploy docs"
+    ],
     "relatedScenarios": [
       "DeployReferenceDocumentation.md"
     ],
     "relatedWorkflows": [
       "PublishDocumentation.yml"
-    ]
+    ],
+    "persona": "Drew",
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Drew&size=80"
   },
   {
-    "id": "version-updater",
+    "id": "alg-version-updater",
     "name": "Version Updater Specialist",
     "description": "Manage version number increments and semantic versioning",
     "expertise": [
@@ -66,16 +90,24 @@
       "Version files",
       "App manifest updates"
     ],
-    "keywords": ["version", "increment", "semantic", "versioning", "app.json"],
+    "keywords": [
+      "version",
+      "increment",
+      "semantic",
+      "versioning",
+      "app.json"
+    ],
     "relatedScenarios": [
       "IncrementVersionNumber.md"
     ],
     "relatedWorkflows": [
       "IncrementVersionNumber.yml"
-    ]
+    ],
+    "persona": "Vera",
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Vera&size=80"
   },
   {
-    "id": "env-publish",
+    "id": "alg-env-publish",
     "name": "Environment Publisher Specialist",
     "description": "Publish Business Central apps to various environments",
     "expertise": [
@@ -85,16 +117,24 @@
       "Publishing targets",
       "Tenant management"
     ],
-    "keywords": ["publish", "environment", "deployment", "tenant", "app publish"],
+    "keywords": [
+      "publish",
+      "environment",
+      "deployment",
+      "tenant",
+      "app publish"
+    ],
     "relatedScenarios": [
       "PublishToEnvironment.md"
     ],
     "relatedWorkflows": [
       "PublishToEnvironment.yml"
-    ]
+    ],
+    "persona": "Ethan",
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Ethan&size=80"
   },
   {
-    "id": "test-current",
+    "id": "alg-test-current",
     "name": "Current Version Test Specialist",
     "description": "Run and manage tests against current version of applications",
     "expertise": [
@@ -104,16 +144,24 @@
       "Quality assurance",
       "Current version testing"
     ],
-    "keywords": ["test", "testing", "current", "quality", "validation"],
+    "keywords": [
+      "test",
+      "testing",
+      "current",
+      "quality",
+      "validation"
+    ],
     "relatedScenarios": [
       "TestCurrentVersion.md"
     ],
     "relatedWorkflows": [
       "TestCurrent.yml"
-    ]
+    ],
+    "persona": "Tara",
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Tara&size=80"
   },
   {
-    "id": "app-provisioner",
+    "id": "alg-app-provisioner",
     "name": "App Provisioner Specialist",
     "description": "Add and manage existing or test applications to projects",
     "expertise": [
@@ -123,17 +171,25 @@
       "App dependencies",
       "App configuration"
     ],
-    "keywords": ["app", "provisioner", "existing app", "test app", "dependency"],
+    "keywords": [
+      "app",
+      "provisioner",
+      "existing app",
+      "test app",
+      "dependency"
+    ],
     "relatedScenarios": [
       "AddExistingTestApp.md",
       "AddExistingAppOrTestApp.md"
     ],
     "relatedWorkflows": [
       "AddExistingApp.yml"
-    ]
+    ],
+    "persona": "Axel",
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Axel&size=80"
   },
   {
-    "id": "cicd-architect",
+    "id": "alg-cicd-architect",
     "name": "CI/CD Architect Specialist",
     "description": "Configure and optimize continuous integration and deployment pipelines",
     "expertise": [
@@ -144,7 +200,13 @@
       "Deployment strategies",
       "GitHub Actions"
     ],
-    "keywords": ["cicd", "pipeline", "automation", "build", "integration"],
+    "keywords": [
+      "cicd",
+      "pipeline",
+      "automation",
+      "build",
+      "integration"
+    ],
     "relatedScenarios": [
       "CiCdPipeline.md",
       "ContinuousIntegration.md"
@@ -152,10 +214,12 @@
     "relatedWorkflows": [
       "CICD.yml",
       "BuildAndTest.yml"
-    ]
+    ],
+    "persona": "Casey",
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Casey&size=80"
   },
   {
-    "id": "app-generator",
+    "id": "alg-app-generator",
     "name": "App Generator Specialist",
     "description": "Create new Business Central applications from templates",
     "expertise": [
@@ -165,16 +229,24 @@
       "Template configuration",
       "App initialization"
     ],
-    "keywords": ["create", "app", "generator", "new", "scaffold"],
+    "keywords": [
+      "create",
+      "app",
+      "generator",
+      "new",
+      "scaffold"
+    ],
     "relatedScenarios": [
       "CreateNewApp.md"
     ],
     "relatedWorkflows": [
       "CreateApp.yml"
-    ]
+    ],
+    "persona": "Grace",
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Grace&size=80"
   },
   {
-    "id": "perf-test-creator",
+    "id": "alg-perf-test-creator",
     "name": "Performance Test Creator Specialist",
     "description": "Create and manage performance test applications for load testing",
     "expertise": [
@@ -184,16 +256,23 @@
       "Performance metrics",
       "Benchmarking"
     ],
-    "keywords": ["performance", "perf test", "load test", "benchmark"],
+    "keywords": [
+      "performance",
+      "perf test",
+      "load test",
+      "benchmark"
+    ],
     "relatedScenarios": [
       "CreateNewPerformanceTestApp.md"
     ],
     "relatedWorkflows": [
       "CreatePerformanceTestApp.yml"
-    ]
+    ],
+    "persona": "Perry",
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Perry&size=80"
   },
   {
-    "id": "test-app-creator",
+    "id": "alg-test-app-creator",
     "name": "Test App Creator Specialist",
     "description": "Create test applications for validation and quality assurance",
     "expertise": [
@@ -203,16 +282,23 @@
       "Test frameworks",
       "Quality assurance"
     ],
-    "keywords": ["test app", "create test", "testing", "qa"],
+    "keywords": [
+      "test app",
+      "create test",
+      "testing",
+      "qa"
+    ],
     "relatedScenarios": [
       "CreateNewTestApp.md"
     ],
     "relatedWorkflows": [
       "CreateTestApp.yml"
-    ]
+    ],
+    "persona": "Tommy",
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Tommy&size=80"
   },
   {
-    "id": "pr-build-engineer",
+    "id": "alg-pr-build-engineer",
     "name": "PR Build Engineer Specialist",
     "description": "Manage pull request build workflows and validation",
     "expertise": [
@@ -222,17 +308,24 @@
       "PR checks",
       "Code quality gates"
     ],
-    "keywords": ["pull request", "pr", "build", "validation"],
+    "keywords": [
+      "pull request",
+      "pr",
+      "build",
+      "validation"
+    ],
     "relatedScenarios": [
       "PullRequestBuild.md"
     ],
     "relatedWorkflows": [
       "PullRequestBuild.yml",
       "PullRequest.yml"
-    ]
+    ],
+    "persona": "Blake",
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Blake&size=80"
   },
   {
-    "id": "future-tester",
+    "id": "alg-future-tester",
     "name": "Future Version Tester Specialist",
     "description": "Test applications against next major and minor versions",
     "expertise": [
@@ -242,7 +335,13 @@
       "Compatibility testing",
       "Upgrade validation"
     ],
-    "keywords": ["test next", "future", "major", "minor", "compatibility"],
+    "keywords": [
+      "test next",
+      "future",
+      "major",
+      "minor",
+      "compatibility"
+    ],
     "relatedScenarios": [
       "TestNextMajor.md",
       "TestNextMinor.md"
@@ -250,10 +349,12 @@
     "relatedWorkflows": [
       "TestNextMajor.yml",
       "TestNextMinor.yml"
-    ]
+    ],
+    "persona": "Finn",
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Finn&size=80"
   },
   {
-    "id": "troubleshooter",
+    "id": "alg-troubleshooter",
     "name": "Troubleshooting Specialist",
     "description": "Diagnose and resolve AL-Go issues and problems",
     "expertise": [
@@ -264,14 +365,23 @@
       "Issue resolution",
       "Best practices"
     ],
-    "keywords": ["troubleshooting", "troubleshoot", "issue", "problem", "error", "debug"],
+    "keywords": [
+      "troubleshooting",
+      "troubleshoot",
+      "issue",
+      "problem",
+      "error",
+      "debug"
+    ],
     "relatedScenarios": [
       "Troubleshooting.md"
     ],
-    "relatedWorkflows": []
+    "relatedWorkflows": [],
+    "persona": "Rex",
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Rex&size=80"
   },
   {
-    "id": "system-updater",
+    "id": "alg-system-updater",
     "name": "System File Updater Specialist",
     "description": "Update and maintain AL-Go system files and configuration",
     "expertise": [
@@ -281,16 +391,24 @@
       "Settings management",
       "System maintenance"
     ],
-    "keywords": ["update", "system", "files", "maintain", "upgrade"],
+    "keywords": [
+      "update",
+      "system",
+      "files",
+      "maintain",
+      "upgrade"
+    ],
     "relatedScenarios": [
       "UpdateAlGoSystemFiles.md"
     ],
     "relatedWorkflows": [
       "UpdateAlGoSystemFiles.yml"
-    ]
+    ],
+    "persona": "Stella",
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Stella&size=80"
   },
   {
-    "id": "build-manager",
+    "id": "alg-build-manager",
     "name": "Build Manager Specialist",
     "description": "Manage AL-Go project builds and build configurations",
     "expertise": [
@@ -300,12 +418,19 @@
       "Build output",
       "Build artifacts"
     ],
-    "keywords": ["build", "build al-go", "compilation", "artifacts"],
+    "keywords": [
+      "build",
+      "build al-go",
+      "compilation",
+      "artifacts"
+    ],
     "relatedScenarios": [
       "BuildAlGoProject.md"
     ],
     "relatedWorkflows": [
       "Build.yml"
-    ]
+    ],
+    "persona": "Bruno",
+    "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Bruno&size=80"
   }
 ]

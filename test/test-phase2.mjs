@@ -44,9 +44,9 @@ try {
   const appResults = specialistService.getByKeyword('app');
   console.log(`  Specialists with "app" keyword: ${appResults.length}`);
 
-  const cicdSpecialist = specialistService.getById('cicd-architect');
+  const cicdSpecialist = specialistService.getById('alg-cicd-architect');
   if (cicdSpecialist) {
-    const related = specialistService.getRelated('cicd-architect');
+    const related = specialistService.getRelated('alg-cicd-architect');
     console.log(`  Related to CICD Architect: ${related.length} specialist(s)`);
     if (related.length > 0) {
       console.log(`    → ${related[0].name}`);
@@ -149,16 +149,27 @@ try {
 console.log('\nTest 6: MCP Tools Registration Check');
 console.log('-'.repeat(60));
 const expectedTools = [
+  // Phase 1 — Documentation
   'search-al-go-docs',
   'get-al-go-workflows',
-  'search-specialists',
-  'list-specialists',
-  'get-specialist',
-  'search-discussions',
-  'get-scenarios',
-  'search-issues',
-  'get-specialist-knowledge',
-  'build-knowledge-graph'
+  'get-server-version',
+  'refresh-al-go-cache',
+  // Phase 1 — Specialists
+  'alg-search-specialists',
+  'alg-list-specialists',
+  'alg-get-specialist',
+  'alg-ask',
+  // Phase 2 — Knowledge sources
+  'alg-search-discussions',
+  'alg-get-scenarios',
+  'alg-search-issues',
+  'alg-get-specialist-knowledge',
+  'alg-build-knowledge-graph',
+  // Phase 3 — Advanced
+  'alg-semantic-search',
+  'alg-graph-visualization',
+  'alg-cache-stats',
+  'alg-clear-cache',
 ];
 
 console.log(`  Expected tools to be registered: ${expectedTools.length}`);

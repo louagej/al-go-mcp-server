@@ -388,12 +388,12 @@ server.registerTool(
 
 // Tool: Search specialists
 server.registerTool(
-  "search-specialists",
+  "alg-search-specialists",
   {
     title: "Search AL-Go Specialists",
-    description: "Search for AL-Go specialists by name, expertise, or keyword",
+    description: "Search for AL-Go specialists by name, persona, expertise, or keyword",
     inputSchema: {
-      query: z.string().describe("Search query (specialist name, expertise, or keyword)")
+      query: z.string().describe("Search query (specialist name, persona name, expertise, or keyword)")
     }
   },
   async ({ query }) => {
@@ -431,7 +431,7 @@ server.registerTool(
 
 // Tool: List all specialists
 server.registerTool(
-  "list-specialists",
+  "alg-list-specialists",
   {
     title: "List All AL-Go Specialists",
     description: "List all available AL-Go specialists and their expertise areas",
@@ -464,12 +464,12 @@ server.registerTool(
 
 // Tool: Get specialist details
 server.registerTool(
-  "get-specialist",
+  "alg-get-specialist",
   {
     title: "Get AL-Go Specialist Details",
     description: "Get detailed information about a specific AL-Go specialist",
     inputSchema: {
-      specialistId: z.string().describe("The ID of the specialist (e.g., 'cicd-architect', 'app-generator')")
+      specialistId: z.string().describe("The ID of the specialist (e.g., 'alg-cicd-architect', 'alg-app-generator')")
     }
   },
   async ({ specialistId }) => {
@@ -480,7 +480,7 @@ server.registerTool(
         return {
           content: [{
             type: "text",
-            text: `Specialist not found: ${specialistId}. Use 'list-specialists' to see available specialists.`
+            text: `Specialist not found: ${specialistId}. Use 'alg-list-specialists' to see available specialists.`
           }],
           isError: true
         };
@@ -510,9 +510,63 @@ server.registerTool(
   }
 );
 
+// Tool: Ask a specialist by persona name
+server.registerTool(
+  "alg-ask",
+  {
+    title: "Ask an AL-Go Specialist",
+    description: "Route a question to a specific AL-Go specialist by persona name (e.g. 'freddy', 'riley', 'casey'). The specialist responds with their avatar and full expertise context. Use this when the user addresses a specialist directly, e.g. 'alg-freddy my dev environment can\\'t be reached' or 'ask casey about CI/CD pipeline failures'.",
+    inputSchema: {
+      specialist: z.string().describe("Persona first name of the specialist (e.g. 'freddy', 'riley', 'casey', 'bruno')"),
+      question: z.string().describe("The question or problem to bring to the specialist")
+    }
+  },
+  async ({ specialist, question }) => {
+    try {
+      const found = getSpecialistService().getByPersona(specialist);
+
+      if (!found) {
+        return {
+          content: [{
+            type: "text",
+            text: `No specialist found with persona "${specialist}". Use \`#alg-list-specialists\` to see all available specialists and their persona names.`
+          }],
+          isError: true
+        };
+      }
+
+      const avatarLine = found.avatarUrl
+        ? `![${found.persona}](${found.avatarUrl})\n`
+        : '';
+      const thinkingHeader = `${avatarLine}**${found.persona}** *(${found.name})* is on it...\n\n---\n\n**Question:** ${question}\n\n`;
+
+      const profile = getSpecialistService().formatSpecialist(found);
+      const related = getSpecialistService().getRelated(found.id);
+      const relatedText = related.length > 0
+        ? `\n\n**Related Specialists:**\n${related.map(s => `- **${s.persona ?? s.name}** (${s.name})`).join('\n')}`
+        : '';
+
+      return {
+        content: [{
+          type: "text",
+          text: `${thinkingHeader}${profile}${relatedText}`
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `Error routing to specialist: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }],
+        isError: true
+      };
+    }
+  }
+);
+
 // Tool: Search discussions
 server.registerTool(
-  "search-discussions",
+  "alg-search-discussions",
   {
     title: "Search AL-Go GitHub Discussions",
     description: "Search for relevant discussions in the AL-Go repository",
@@ -558,7 +612,7 @@ server.registerTool(
 
 // Tool: Get scenarios
 server.registerTool(
-  "get-scenarios",
+  "alg-get-scenarios",
   {
     title: "Get AL-Go Scenarios",
     description: "Get available AL-Go setup scenarios",
@@ -601,7 +655,7 @@ server.registerTool(
 
 // Tool: Search resolved issues
 server.registerTool(
-  "search-issues",
+  "alg-search-issues",
   {
     title: "Search AL-Go Resolved Issues",
     description: "Search for tips and tricks in resolved AL-Go issues",
@@ -647,7 +701,7 @@ server.registerTool(
 
 // Tool: Get specialist knowledge
 server.registerTool(
-  "get-specialist-knowledge",
+  "alg-get-specialist-knowledge",
   {
     title: "Get Specialist Knowledge",
     description: "Get comprehensive knowledge for a specialist including workshops, scenarios, discussions, and issues",
@@ -691,7 +745,7 @@ server.registerTool(
 
 // Tool: Build knowledge graph
 server.registerTool(
-  "build-knowledge-graph",
+  "alg-build-knowledge-graph",
   {
     title: "Build Knowledge Graph",
     description: "Initialize and build the knowledge graph linking specialists to all knowledge sources",
@@ -743,7 +797,7 @@ server.registerTool(
 
 // Tool: Semantic search across all knowledge sources
 server.registerTool(
-  "semantic-search",
+  "alg-semantic-search",
   {
     title: "Semantic Search",
     description: "Intelligent cross-source search across workshops, scenarios, discussions, and issues using relevance scoring",
@@ -790,7 +844,7 @@ server.registerTool(
 
 // Tool: Get knowledge graph visualization
 server.registerTool(
-  "graph-visualization",
+  "alg-graph-visualization",
   {
     title: "Knowledge Graph Visualization",
     description: "Get knowledge graph structure for visualization (nodes and edges)",
@@ -866,7 +920,7 @@ server.registerTool(
 
 // Tool: Get cache statistics
 server.registerTool(
-  "cache-stats",
+  "alg-cache-stats",
   {
     title: "Cache Statistics",
     description: "Get cache hit rates and statistics for knowledge sources",
@@ -897,7 +951,7 @@ server.registerTool(
 
 // Tool: Clear cache selectively
 server.registerTool(
-  "clear-cache",
+  "alg-clear-cache",
   {
     title: "Clear Cache",
     description: "Clear cached knowledge sources or entire cache",
