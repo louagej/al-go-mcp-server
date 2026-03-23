@@ -61,7 +61,7 @@ jobs:
           if [ -z "$LAST_RELEASE_DATE" ]; then
             PR_BODIES=$(gh pr list --state merged --base main --json body --jq '[.[].body] | join("\n---PR_SEPARATOR---\n")')
           else
-            PR_BODIES=$(gh pr list --state merged --base main --json body,mergedAt --jq --arg since "$LAST_RELEASE_DATE" '[.[] | select(.mergedAt > $since) | .body] | join("\n---PR_SEPARATOR---\n")')
+            PR_BODIES=$(gh pr list --state merged --base main --json body,mergedAt --jq "[.[] | select(.mergedAt > \"$LAST_RELEASE_DATE\") | .body] | join(\"\n---PR_SEPARATOR---\n\")")
           fi
           echo "PR_BODIES<<EOF" >> $GITHUB_OUTPUT
           echo "$PR_BODIES" >> $GITHUB_OUTPUT
