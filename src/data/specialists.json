@@ -1,6 +1,6 @@
 [
   {
-    "id": "online-dev-env",
+    "id": "alg-online-dev-env",
     "name": "Online Dev Environment Specialist",
     "description": "Create and manage cloud-based development environments for AL-Go projects",
     "expertise": [
@@ -26,7 +26,7 @@
     "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Freddy&size=80"
   },
   {
-    "id": "release-manager",
+    "id": "alg-release-manager",
     "name": "Release Manager Specialist",
     "description": "Handle release creation, versioning strategies, and deployment coordination",
     "expertise": [
@@ -54,7 +54,7 @@
     "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Riley&size=80"
   },
   {
-    "id": "doc-publisher",
+    "id": "alg-doc-publisher",
     "name": "Documentation Publisher Specialist",
     "description": "Deploy and manage reference documentation for Business Central extensions",
     "expertise": [
@@ -80,7 +80,7 @@
     "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Drew&size=80"
   },
   {
-    "id": "version-updater",
+    "id": "alg-version-updater",
     "name": "Version Updater Specialist",
     "description": "Manage version number increments and semantic versioning",
     "expertise": [
@@ -107,7 +107,7 @@
     "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Vera&size=80"
   },
   {
-    "id": "env-publish",
+    "id": "alg-env-publish",
     "name": "Environment Publisher Specialist",
     "description": "Publish Business Central apps to various environments",
     "expertise": [
@@ -134,7 +134,7 @@
     "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Ethan&size=80"
   },
   {
-    "id": "test-current",
+    "id": "alg-test-current",
     "name": "Current Version Test Specialist",
     "description": "Run and manage tests against current version of applications",
     "expertise": [
@@ -161,7 +161,7 @@
     "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Tara&size=80"
   },
   {
-    "id": "app-provisioner",
+    "id": "alg-app-provisioner",
     "name": "App Provisioner Specialist",
     "description": "Add and manage existing or test applications to projects",
     "expertise": [
@@ -189,7 +189,7 @@
     "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Axel&size=80"
   },
   {
-    "id": "cicd-architect",
+    "id": "alg-cicd-architect",
     "name": "CI/CD Architect Specialist",
     "description": "Configure and optimize continuous integration and deployment pipelines",
     "expertise": [
@@ -219,7 +219,7 @@
     "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Casey&size=80"
   },
   {
-    "id": "app-generator",
+    "id": "alg-app-generator",
     "name": "App Generator Specialist",
     "description": "Create new Business Central applications from templates",
     "expertise": [
@@ -246,7 +246,7 @@
     "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Grace&size=80"
   },
   {
-    "id": "perf-test-creator",
+    "id": "alg-perf-test-creator",
     "name": "Performance Test Creator Specialist",
     "description": "Create and manage performance test applications for load testing",
     "expertise": [
@@ -272,7 +272,7 @@
     "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Perry&size=80"
   },
   {
-    "id": "test-app-creator",
+    "id": "alg-test-app-creator",
     "name": "Test App Creator Specialist",
     "description": "Create test applications for validation and quality assurance",
     "expertise": [
@@ -298,7 +298,7 @@
     "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Tommy&size=80"
   },
   {
-    "id": "pr-build-engineer",
+    "id": "alg-pr-build-engineer",
     "name": "PR Build Engineer Specialist",
     "description": "Manage pull request build workflows and validation",
     "expertise": [
@@ -325,7 +325,7 @@
     "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Blake&size=80"
   },
   {
-    "id": "future-tester",
+    "id": "alg-future-tester",
     "name": "Future Version Tester Specialist",
     "description": "Test applications against next major and minor versions",
     "expertise": [
@@ -354,7 +354,7 @@
     "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Finn&size=80"
   },
   {
-    "id": "troubleshooter",
+    "id": "alg-troubleshooter",
     "name": "Troubleshooting Specialist",
     "description": "Diagnose and resolve AL-Go issues and problems",
     "expertise": [
@@ -381,7 +381,7 @@
     "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Rex&size=80"
   },
   {
-    "id": "system-updater",
+    "id": "alg-system-updater",
     "name": "System File Updater Specialist",
     "description": "Update and maintain AL-Go system files and configuration",
     "expertise": [
@@ -408,7 +408,7 @@
     "avatarUrl": "https://api.dicebear.com/9.x/adventurer/png?seed=Stella&size=80"
   },
   {
-    "id": "build-manager",
+    "id": "alg-build-manager",
     "name": "Build Manager Specialist",
     "description": "Manage AL-Go project builds and build configurations",
     "expertise": [

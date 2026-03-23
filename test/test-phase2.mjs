@@ -44,9 +44,9 @@ try {
   const appResults = specialistService.getByKeyword('app');
   console.log(`  Specialists with "app" keyword: ${appResults.length}`);
 
-  const cicdSpecialist = specialistService.getById('cicd-architect');
+  const cicdSpecialist = specialistService.getById('alg-cicd-architect');
   if (cicdSpecialist) {
-    const related = specialistService.getRelated('cicd-architect');
+    const related = specialistService.getRelated('alg-cicd-architect');
     console.log(`  Related to CICD Architect: ${related.length} specialist(s)`);
     if (related.length > 0) {
       console.log(`    → ${related[0].name}`);
@@ -158,6 +158,7 @@ const expectedTools = [
   'alg-search-specialists',
   'alg-list-specialists',
   'alg-get-specialist',
+  'alg-ask',
   // Phase 2 — Knowledge sources
   'alg-search-discussions',
   'alg-get-scenarios',

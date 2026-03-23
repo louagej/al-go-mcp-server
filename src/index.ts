@@ -469,7 +469,7 @@ server.registerTool(
     title: "Get AL-Go Specialist Details",
     description: "Get detailed information about a specific AL-Go specialist",
     inputSchema: {
-      specialistId: z.string().describe("The ID of the specialist (e.g., 'cicd-architect', 'app-generator')")
+      specialistId: z.string().describe("The ID of the specialist (e.g., 'alg-cicd-architect', 'alg-app-generator')")
     }
   },
   async ({ specialistId }) => {
@@ -503,6 +503,60 @@ server.registerTool(
         content: [{
           type: "text",
           text: `Error retrieving specialist details: ${error instanceof Error ? error.message : 'Unknown error'}`
+        }],
+        isError: true
+      };
+    }
+  }
+);
+
+// Tool: Ask a specialist by persona name
+server.registerTool(
+  "alg-ask",
+  {
+    title: "Ask an AL-Go Specialist",
+    description: "Route a question to a specific AL-Go specialist by persona name (e.g. 'freddy', 'riley', 'casey'). The specialist responds with their avatar and full expertise context. Use this when the user addresses a specialist directly, e.g. 'alg-freddy my dev environment can\\'t be reached' or 'ask casey about CI/CD pipeline failures'.",
+    inputSchema: {
+      specialist: z.string().describe("Persona first name of the specialist (e.g. 'freddy', 'riley', 'casey', 'bruno')"),
+      question: z.string().describe("The question or problem to bring to the specialist")
+    }
+  },
+  async ({ specialist, question }) => {
+    try {
+      const found = getSpecialistService().getByPersona(specialist);
+
+      if (!found) {
+        return {
+          content: [{
+            type: "text",
+            text: `No specialist found with persona "${specialist}". Use \`#alg-list-specialists\` to see all available specialists and their persona names.`
+          }],
+          isError: true
+        };
+      }
+
+      const avatarLine = found.avatarUrl
+        ? `![${found.persona}](${found.avatarUrl})\n`
+        : '';
+      const thinkingHeader = `${avatarLine}**${found.persona}** *(${found.name})* is on it...\n\n---\n\n**Question:** ${question}\n\n`;
+
+      const profile = getSpecialistService().formatSpecialist(found);
+      const related = getSpecialistService().getRelated(found.id);
+      const relatedText = related.length > 0
+        ? `\n\n**Related Specialists:**\n${related.map(s => `- **${s.persona ?? s.name}** (${s.name})`).join('\n')}`
+        : '';
+
+      return {
+        content: [{
+          type: "text",
+          text: `${thinkingHeader}${profile}${relatedText}`
+        }]
+      };
+    } catch (error) {
+      return {
+        content: [{
+          type: "text",
+          text: `Error routing to specialist: ${error instanceof Error ? error.message : 'Unknown error'}`
         }],
         isError: true
       };

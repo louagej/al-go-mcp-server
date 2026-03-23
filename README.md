@@ -117,9 +117,12 @@ npx --yes al-go-mcp-server@latest
 
 | Tool | Description |
 |------|-------------|
-| `alg-search-specialists` | Find domain specialists by keyword or expertise area |
+| `alg-search-specialists` | Find domain specialists by keyword, persona name, or expertise area |
 | `alg-list-specialists` | Browse all 16 AL-Go domain specialists |
 | `alg-get-specialist` | Get detailed profile for a specific specialist |
+| `alg-ask` | Ask a specialist by persona name — routes your question with avatar context |
+
+> **Tip:** Address specialists directly in chat: `alg-freddy my dev environment can't be reached` — Copilot will call `alg-ask` and Freddy responds with his avatar and expertise.
 
 ### Knowledge Sources
 

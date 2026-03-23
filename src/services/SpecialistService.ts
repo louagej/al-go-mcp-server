@@ -116,6 +116,14 @@ export class SpecialistService {
   }
 
   /**
+   * Get specialist by persona name (case-insensitive)
+   */
+  getByPersona(personaName: string): Specialist | undefined {
+    const lower = personaName.toLowerCase();
+    return this.specialists.find(s => s.persona?.toLowerCase() === lower);
+  }
+
+  /**
    * Get specialist count
    */
   count(): number {
