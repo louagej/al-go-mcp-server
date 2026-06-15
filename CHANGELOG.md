@@ -12,6 +12,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+
+## [2.8.0] - 2026-06-15
+
+### Added
+- update PAT
+
+### Changed
+- update PAT
+
+### Fixed
+- `create-release` workflow failing on checkout due to Node.js 20 action deprecation enforcement
+- --
+- ## Checklist
+- [ ] ✅ Built successfully (`npm run build`)
+- [ ] ✅ Tests pass (`node test/test-functionality.mjs && node test/test-phase2.mjs`)
+- [ ] ✅ No sensitive information committed
+- [ ] ✅ README updated (if applicable)
+- `create-release` workflow checkout failure caused by `actions/checkout@v6` regression in explicit-token credential handling
+- 7 npm transitive dependency vulnerabilities (5 moderate, 2 high) detected by `npm audit --audit-level=moderate` in `hono`, `@hono/node-server`, `fast-uri`, `path-to-regexp`, `ip-address`, and `qs`
+- [x] ✅ Built successfully (`npm run build`)
+- [x] ✅ Tests pass (`node test/test-functionality.mjs && node test/test-phase2.mjs`)
+- [x] ✅ No sensitive information committed
+- CI build failure: `TS5101` error from TypeScript 6 deprecating `baseUrl` without `ignoreDeprecations`
+- CI build failure: `TS2591` errors from missing Node.js ambient types under TypeScript 6 `Node16` module resolution
+- CI engine mismatch warnings: Node 18 → 20 to satisfy `@octokit` `>=20` engine requirement
+- [x] ✅ README updated (if applicable)
+- <!-- START COPILOT ORIGINAL PROMPT -->
+- <details>
+- <summary>Original prompt</summary>
+- > Fix CI workflow failure in `louagej/al-go-mcp-server`.
+- >
+- > Context: GitHub Actions run failed (job 72078806320, ref `5020d41a7a7ec5569aecae9a2d62d3a0e68c1974`). Logs show:
+- > - TypeScript build error: `tsconfig.json(17,5): error TS5101: Option 'baseUrl' is deprecated and will stop functioning in TypeScript 7.0. Specify compilerOption '"ignoreDeprecations": "6.0"' to silence this error.`
+- > - Node engine warnings: dependencies require Node `>= 20` but CI is using Node `v18.20.8`.
+- > Tasks:
+- > 1) Update the CI workflow at `.github/workflows/ci.yml` to use Node.js 20 (or newer LTS, preferably 20) via `actions/setup-node`.
+- > 2) Update `tsconfig.json` to add `"ignoreDeprecations": "6.0"` under `compilerOptions` to silence TS5101 and allow the build to succeed under TypeScript 6.
+- > 3) Ensure `npm ci` / `npm install` and `npm run build` succeed in CI after changes.
+- > Constraints:
+- > - Keep changes minimal and focused on fixing the CI failure.
+- > - Do not refactor unrelated code.
+- > PR base branch: `main`.
+- > The following is the prior conversation context from the user's chat exploration (may be truncated):
+- > User: The cicd workflow failed of my al-go-mcp server: https://github.com/louagej/al-go-mcp-server/actions/runs/24652696711/job/72078806320
+- > Can you try to fix this?
+- > Assistant: The failure is coming from TypeScript 6 treating `compilerOptions.baseUrl` as a *deprecated option* and turning it into an error:
+- > - `tsconfig.json(17,5): error TS5101: Option 'baseUrl' is deprecated ... Specify compilerOption '"ignoreDeprecations": "6.0"' to silence this error.`
+- > (ref: `5020d41a7a7ec5569aecae9a2d62d3a0e68c1974`)
+- > You also have Node engine warnings because the workflow is running Node **18.20.8** while some deps require **Node >= 20**:
+- > - `npm warn EBADENGINE ... required: { node: '>= 20' } current: { node: 'v18.20.8' ... }`
+- > ### What to change
+- > 1) **Fix the TS build error** by adding this to `compilerOptions` in `tsconfig.json`:
+- > ```json
+- > "ignoreDeprecations": "6.0"
+- > ```
+- > (That’s exactly what the error message is asking for.)
+- > 2) **Fix the Node engine mismatch** by updating the GitHub Actions workflow to use **Node 20** (or 22) instead of 18 (usually in `actions/setup-node`’s `node-version:`).
+- > ### I can apply the fix for you
+- > Do you want me to open a PR in `louagej/al-go-mcp-server` that:
+- > - updates `.github/workflows/ci.yml` to use Node 20, and
+- > - updates `tsconfig.json` to add `"ignoreDeprecations": "6.0"`?
+- > If yes, tell me which base branch to target (e.g. `main`).
+- > User: main
+- > Assistant: I’ve kicked off creating a PR against `main` with the CI fixes (switch CI to Node 20 and add `"ignoreDeprecations": "6.0"` in `tsconfig.json`)
+- I’m waiting for your approval in the confirmation dialog to proceed.
+- </details>
+- <!-- START COPILOT CODING AGENT SUFFIX -->
+- This pull request was created from Copilot chat.*
+
 ## [2.7.0] - 2026-03-23
 
 ### Added
