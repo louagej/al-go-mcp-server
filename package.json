@@ -30,7 +30,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.18.0",
     "@octokit/rest": "^22.0.1",
-    "dotenv": "^17.2.3",
+    "dotenv": "^18.0.0",
     "node-fetch": "^3.3.2",
     "zod": "^4.2.1"
   },
