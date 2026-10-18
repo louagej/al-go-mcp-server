@@ -7,14 +7,15 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 
 const serverPath = fileURLToPath(new URL('../build/index.js', import.meta.url));
 
 /**
- * Create a fake home with an existing VS Code user folder, so we can check
- * whether the server writes agent files into it
+ * Create a fake home where VS Code and Claude Code look installed, so we can
+ * check whether the server writes agent files into them
  */
 function makeFakeHome() {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), 'algo-mcp-test-'));
@@ -25,14 +26,25 @@ function makeFakeHome() {
       ? path.join(home, 'Library', 'Application Support', 'Code', 'User')
       : path.join(home, '.config', 'Code', 'User');
   fs.mkdirSync(userDir, { recursive: true });
-  return { home, appData, promptsDir: path.join(userDir, 'prompts') };
+  fs.mkdirSync(path.join(home, '.claude'));
+  return { home, appData, promptsDir: path.join(userDir, 'prompts'), claudeAgentsDir: path.join(home, '.claude', 'agents') };
 }
 
-async function startServer(extraEnv = {}) {
-  const fake = makeFakeHome();
+function fakeEnv(fake, extraEnv = {}) {
   const env = { ...process.env, HOME: fake.home, USERPROFILE: fake.home, APPDATA: fake.appData, ...extraEnv };
   delete env.GITHUB_TOKEN;
   delete env.AL_GO_MCP_GITHUB_TOKEN;
+  delete env.CLAUDE_CONFIG_DIR;
+  return env;
+}
+
+const agentFiles = (dir, pattern) => fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => pattern.test(f)) : [];
+const VSCODE_AGENT = /^alg-[a-z]+\.agent\.md$/;
+const CLAUDE_AGENT = /^alg-[a-z]+\.md$/;
+
+async function startServer(extraEnv = {}) {
+  const fake = makeFakeHome();
+  const env = fakeEnv(fake, extraEnv);
 
   const transport = new StdioClientTransport({ command: process.execPath, args: [serverPath], env, stderr: 'ignore' });
   const transportErrors = [];
@@ -114,19 +126,44 @@ test('stdout carries only JSON-RPC', () => {
 
 test('agent files are not written by default', () => {
   assert.equal(fs.existsSync(server.fake.promptsDir), false);
+  assert.equal(fs.existsSync(server.fake.claudeAgentsDir), false);
 });
 
-test('agent files are written when AL_GO_MCP_INSTALL_AGENTS=true', async () => {
+test('AL_GO_MCP_INSTALL_AGENTS=true installs agents for VS Code and Claude Code', async () => {
   const optedIn = await startServer({ AL_GO_MCP_INSTALL_AGENTS: 'true' });
   try {
     // Files are written right after connecting; poll briefly
-    for (let i = 0; i < 50 && !(fs.existsSync(optedIn.fake.promptsDir) && fs.readdirSync(optedIn.fake.promptsDir).length >= 16); i++) {
+    for (let i = 0; i < 50 && agentFiles(optedIn.fake.claudeAgentsDir, CLAUDE_AGENT).length < 16; i++) {
       await new Promise(resolve => setTimeout(resolve, 100));
     }
-    const files = fs.readdirSync(optedIn.fake.promptsDir);
-    assert.equal(files.filter(f => /^alg-[a-z]+\.agent\.md$/.test(f)).length, 16);
+    assert.equal(agentFiles(optedIn.fake.promptsDir, VSCODE_AGENT).length, 16);
+    assert.equal(agentFiles(optedIn.fake.claudeAgentsDir, CLAUDE_AGENT).length, 16);
   } finally {
     await optedIn.client.close();
     fs.rmSync(optedIn.fake.home, { recursive: true, force: true });
+  }
+});
+
+test('--install-agents=claude installs only Claude Code agents and exits', () => {
+  const fake = makeFakeHome();
+  try {
+    const output = execFileSync(process.execPath, [serverPath, '--install-agents=claude'], { env: fakeEnv(fake), encoding: 'utf8' });
+    assert.match(output, /claude: wrote 16 specialist agents/);
+    assert.equal(agentFiles(fake.claudeAgentsDir, CLAUDE_AGENT).length, 16);
+    assert.equal(fs.existsSync(fake.promptsDir), false);
+  } finally {
+    fs.rmSync(fake.home, { recursive: true, force: true });
+  }
+});
+
+test('--install-agents skips clients that are not installed', () => {
+  const fake = makeFakeHome();
+  fs.rmSync(path.join(fake.home, '.claude'), { recursive: true });
+  try {
+    const output = execFileSync(process.execPath, [serverPath, '--install-agents'], { env: fakeEnv(fake), encoding: 'utf8' });
+    assert.match(output, /vscode: wrote 16/);
+    assert.match(output, /claude: skipped \(Claude Code config directory not found\)/);
+  } finally {
+    fs.rmSync(fake.home, { recursive: true, force: true });
   }
 });

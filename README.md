@@ -95,9 +95,27 @@ Provide a GitHub token for higher rate limits, and to enable discussion and issu
 
 `AL_GO_MCP_GITHUB_TOKEN` is accepted as an alternative to `GITHUB_TOKEN`.
 
-### Specialist Agents in Copilot Chat (Optional)
+### Claude Code
 
-Set `AL_GO_MCP_INSTALL_AGENTS` to `true` to have the server write the 16 `@alg-*` specialist agent files to your VS Code user prompts folder at startup (e.g. `%APPDATA%\Code\User\prompts` on Windows), so they appear in the Copilot Chat agent picker in every workspace:
+Add the server for all your projects:
+
+```bash
+claude mcp add --scope user al-go-docs -e GITHUB_TOKEN=your_github_token_here -- npx --yes al-go-mcp-server@latest
+```
+
+### Specialist Agents (Optional)
+
+The 16 specialists can be installed as agents in **Claude Code** (`~/.claude/agents`) and **VS Code Copilot Chat** (your VS Code user prompts folder, e.g. `%APPDATA%CodeUserprompts` on Windows), so they are available in every project.
+
+Install once from the command line:
+
+```bash
+npx --yes al-go-mcp-server@latest --install-agents          # every client found on this machine
+npx --yes al-go-mcp-server@latest --install-agents=claude   # Claude Code only
+npx --yes al-go-mcp-server@latest --install-agents=vscode   # VS Code only
+```
+
+Or let the server keep them up to date on every start by setting `AL_GO_MCP_INSTALL_AGENTS` to `true`, `claude` or `vscode` in its `env`:
 
 ```json
 "env": {
@@ -105,7 +123,8 @@ Set `AL_GO_MCP_INSTALL_AGENTS` to `true` to have the server write the 16 `@alg-*
 }
 ```
 
-The agent files call the server's tools as `al-go-docs/*`, so keep `al-go-docs` as the server name.
+- **Claude Code**: restart the session to load new agents. Claude delegates AL-Go questions to the matching specialist on its own, or you can ask for one: `use alg-rex to find out why my CI/CD workflow fails`. Agents are listed under `/agents`.
+- **VS Code**: the agents appear in the Copilot Chat agent picker as `@alg-*`. They call the server's tools as `al-go-docs/*`, so keep `al-go-docs` as the server name.
 
 ### Command Line (Advanced)
 
@@ -136,7 +155,7 @@ npx --yes al-go-mcp-server@latest
 | `alg-get-specialist` | Get detailed profile for a specific specialist |
 | `alg-ask` | Ask a specialist by persona name — routes your question with avatar context |
 
-> **Tip:** Address specialists directly in chat: `@alg-freddy my dev environment can't be reached` — Copilot will call `alg-ask` and Freddy responds with his avatar and expertise. This requires the agent files; see [Specialist Agents in Copilot Chat](#specialist-agents-in-copilot-chat-optional).
+> **Tip:** Address specialists directly in chat: `@alg-freddy my dev environment can't be reached` — Copilot will call `alg-ask` and Freddy responds with his avatar and expertise. This requires the agent files; see [Specialist Agents](#specialist-agents-optional).
 
 ### Knowledge Sources
 
