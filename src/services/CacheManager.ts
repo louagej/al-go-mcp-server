@@ -1,11 +1,9 @@
 /**
- * Cache configuration with TTL per source type
+ * Cached knowledge source types
  */
-export interface CacheConfig {
-  source: 'workshop' | 'scenario' | 'discussion' | 'issue';
-  ttlMs: number;
-  maxSize?: number;
-}
+export type CacheSource = 'docs' | 'discussion' | 'issue';
+
+export const CACHE_SOURCES: readonly CacheSource[] = ['docs', 'discussion', 'issue'];
 
 /**
  * Cached item with metadata
@@ -13,133 +11,88 @@ export interface CacheConfig {
 interface CacheItem<T> {
   data: T;
   timestamp: number;
-  source: string;
+  source: CacheSource;
 }
 
 /**
- * Advanced cache manager with per-source TTL and selective refresh
+ * Single cache for everything fetched from GitHub, with per-source TTL
+ * and hit/miss statistics
  */
 export class CacheManager {
   private cache: Map<string, CacheItem<any>> = new Map();
-  private stats: Map<string, { hits: number; misses: number; refreshes: number }> = new Map();
+  private inFlight: Map<string, Promise<any>> = new Map();
+  private stats: Map<CacheSource, { hits: number; misses: number }> = new Map();
 
   // TTL configuration per source type (in milliseconds)
-  private readonly ttlConfig: Map<string, number> = new Map([
-    ['workshop', 24 * 60 * 60 * 1000],      // 24 hours - foundational, stable
-    ['scenario', 24 * 60 * 60 * 1000],      // 24 hours - updated with releases
-    ['discussion', 6 * 60 * 60 * 1000],     // 6 hours - frequently updated Q&A
-    ['issue', 12 * 60 * 60 * 1000]          // 12 hours - resolved issues less frequent
-  ]);
+  private readonly ttlConfig: Record<CacheSource, number> = {
+    docs: 24 * 60 * 60 * 1000,        // 24 hours - documentation changes with AL-Go releases
+    discussion: 6 * 60 * 60 * 1000,   // 6 hours - frequently updated Q&A
+    issue: 12 * 60 * 60 * 1000        // 12 hours - resolved issues change less often
+  };
 
-  constructor() {
-    this.initializeStats();
-  }
-
-  /**
-   * Initialize statistics tracking
-   */
-  private initializeStats(): void {
-    for (const source of ['workshop', 'scenario', 'discussion', 'issue']) {
-      this.stats.set(source, { hits: 0, misses: 0, refreshes: 0 });
+  constructor(private readonly now: () => number = Date.now) {
+    for (const source of CACHE_SOURCES) {
+      this.stats.set(source, { hits: 0, misses: 0 });
     }
   }
 
-  /**
-   * Generate cache key
-   */
-  private getKey(source: string, query: string): string {
-    return `${source}:${query}`;
+  private getKey(source: CacheSource, key: string): string {
+    return `${source}:${key}`;
   }
 
   /**
-   * Get item from cache if valid
+   * Get item from cache if still within its TTL
    */
-  get<T>(source: string, query: string): T | null {
-    const key = this.getKey(source, query);
-    const item = this.cache.get(key);
+  get<T>(source: CacheSource, key: string): T | undefined {
+    const cacheKey = this.getKey(source, key);
+    const item = this.cache.get(cacheKey);
+    const stat = this.stats.get(source)!;
 
-    if (!item) {
-      this.recordMiss(source);
-      return null;
+    if (!item || this.now() - item.timestamp > this.ttlConfig[source]) {
+      if (item) this.cache.delete(cacheKey);
+      stat.misses++;
+      return undefined;
     }
 
-    const ttl = this.getTTL(source);
-    const age = Date.now() - item.timestamp;
-
-    if (age > ttl) {
-      this.cache.delete(key);
-      this.recordMiss(source);
-      return null;
-    }
-
-    this.recordHit(source);
+    stat.hits++;
     return item.data as T;
   }
 
   /**
    * Set item in cache
    */
-  set<T>(source: string, query: string, data: T): void {
-    const key = this.getKey(source, query);
-    this.cache.set(key, {
-      data,
-      timestamp: Date.now(),
-      source
-    });
+  set<T>(source: CacheSource, key: string, data: T): void {
+    this.cache.set(this.getKey(source, key), { data, timestamp: this.now(), source });
   }
 
   /**
-   * Get TTL for source type
+   * Return the cached value, or run the loader and cache its result.
+   * Concurrent callers for the same key share one loader call; failures are not cached.
    */
-  private getTTL(source: string): number {
-    return this.ttlConfig.get(source) || (24 * 60 * 60 * 1000);
+  async getOrLoad<T>(source: CacheSource, key: string, loader: () => Promise<T>): Promise<T> {
+    const cached = this.get<T>(source, key);
+    if (cached !== undefined) return cached;
+
+    const cacheKey = this.getKey(source, key);
+    let pending = this.inFlight.get(cacheKey) as Promise<T> | undefined;
+    if (!pending) {
+      pending = loader()
+        .then(data => {
+          this.set(source, key, data);
+          return data;
+        })
+        .finally(() => this.inFlight.delete(cacheKey));
+      this.inFlight.set(cacheKey, pending);
+    }
+    return pending;
   }
 
   /**
-   * Check if cache is valid for source
+   * Clear cache for a specific source type
    */
-  isValid(source: string, query: string): boolean {
-    const key = this.getKey(source, query);
-    const item = this.cache.get(key);
-
-    if (!item) return false;
-
-    const ttl = this.getTTL(source);
-    const age = Date.now() - item.timestamp;
-
-    return age <= ttl;
-  }
-
-  /**
-   * Record cache hit
-   */
-  private recordHit(source: string): void {
-    const stat = this.stats.get(source);
-    if (stat) stat.hits++;
-  }
-
-  /**
-   * Record cache miss
-   */
-  private recordMiss(source: string): void {
-    const stat = this.stats.get(source);
-    if (stat) stat.misses++;
-  }
-
-  /**
-   * Record refresh
-   */
-  recordRefresh(source: string): void {
-    const stat = this.stats.get(source);
-    if (stat) stat.refreshes++;
-  }
-
-  /**
-   * Clear cache for specific source type
-   */
-  clearSource(source: string): number {
+  clearSource(source: CacheSource): number {
     let count = 0;
-    for (const [key] of this.cache) {
+    for (const key of this.cache.keys()) {
       if (key.startsWith(`${source}:`)) {
         this.cache.delete(key);
         count++;
@@ -149,75 +102,34 @@ export class CacheManager {
   }
 
   /**
-   * Clear all expired items
-   */
-  clearExpired(): number {
-    let count = 0;
-    const now = Date.now();
-
-    for (const [key, item] of this.cache) {
-      const ttl = this.getTTL(item.source);
-      if (now - item.timestamp > ttl) {
-        this.cache.delete(key);
-        count++;
-      }
-    }
-
-    return count;
-  }
-
-  /**
    * Clear all cache
    */
-  clearAll(): void {
+  clearAll(): number {
+    const count = this.cache.size;
     this.cache.clear();
+    return count;
   }
 
   /**
    * Get cache statistics
    */
-  getStats(): Record<string, any> {
-    const stats: Record<string, any> = {
-      totalItems: this.cache.size,
-      sources: {}
-    };
+  getStats(): { totalItems: number; sources: Record<CacheSource, { items: number; hits: number; misses: number; hitRate: string; ttl: string }> } {
+    const sources = {} as Record<CacheSource, { items: number; hits: number; misses: number; hitRate: string; ttl: string }>;
 
-    for (const [source, data] of this.stats) {
-      const total = data.hits + data.misses;
-      const hitRate = total > 0 ? ((data.hits / total) * 100).toFixed(1) : 'N/A';
-
-      stats.sources[source] = {
-        hits: data.hits,
-        misses: data.misses,
-        refreshes: data.refreshes,
-        hitRate: `${hitRate}%`,
-        ttl: `${this.getTTL(source) / (60 * 60 * 1000)}h`
+    for (const source of CACHE_SOURCES) {
+      const { hits, misses } = this.stats.get(source)!;
+      const total = hits + misses;
+      const items = [...this.cache.values()].filter(i => i.source === source).length;
+      sources[source] = {
+        items,
+        hits,
+        misses,
+        hitRate: total > 0 ? `${((hits / total) * 100).toFixed(1)}%` : 'n/a',
+        ttl: `${this.ttlConfig[source] / (60 * 60 * 1000)}h`
       };
     }
 
-    return stats;
-  }
-
-  /**
-   * Get all items for a source (for monitoring)
-   */
-  getSourceItems(source: string): Array<{ key: string; age: string; ttl: string }> {
-    const items = [];
-    const now = Date.now();
-    const ttl = this.getTTL(source);
-
-    for (const [key, item] of this.cache) {
-      if (item.source === source) {
-        const age = now - item.timestamp;
-        items.push({
-          key,
-          age: `${(age / 60000).toFixed(1)}m`,
-          ttl: `${(ttl / (60 * 60 * 1000)).toFixed(0)}h`
-        });
-      }
-    }
-
-    return items;
+    return { totalItems: this.cache.size, sources };
   }
 
   /**
@@ -226,16 +138,12 @@ export class CacheManager {
   formatStats(): string {
     const stats = this.getStats();
 
-    let output = `Cache Statistics\n`;
-    output += `Total items: ${stats.totalItems}\n\n`;
-
-    for (const [source, data] of Object.entries(stats.sources)) {
-      const stat = data as any;
-      output += `**${source.toUpperCase()}**\n`;
-      output += `  Hits: ${stat.hits} | Misses: ${stat.misses} | Hit Rate: ${stat.hitRate}\n`;
-      output += `  Refreshes: ${stat.refreshes} | TTL: ${stat.ttl}\n\n`;
+    let output = `Total cached items: ${stats.totalItems}\n\n`;
+    for (const [source, stat] of Object.entries(stats.sources)) {
+      output += `**${source.toUpperCase()}** (TTL ${stat.ttl})\n`;
+      output += `  Items: ${stat.items} | Hits: ${stat.hits} | Misses: ${stat.misses} | Hit rate: ${stat.hitRate}\n\n`;
     }
 
-    return output;
+    return output.trimEnd();
   }
 }

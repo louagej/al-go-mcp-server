@@ -29,6 +29,6 @@ Brief description of what this PR does.
 ## Checklist
 
 - [ ] ✅ Built successfully (`npm run build`)
-- [ ] ✅ Tests pass (`node test/test-functionality.mjs && node test/test-phase2.mjs`)
+- [ ] ✅ Tests pass (`npm test`)
 - [ ] ✅ No sensitive information committed
 - [ ] ✅ README updated (if applicable)

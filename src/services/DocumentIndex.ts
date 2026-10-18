@@ -1,4 +1,5 @@
-import { AlGoService } from "./AlGoService.js";
+import { DocFile } from "./AlGoService.js";
+import { Bm25Index, tokenize } from "./TextSearch.js";
 
 export interface SearchResult {
   title: string;
@@ -13,99 +14,69 @@ export interface DocumentEntry {
   content: string;
   name: string;
   title: string;
-  lastIndexed: Date;
 }
 
 /**
- * Service for indexing and searching AL-Go documentation
+ * Anything that can supply AL-Go documentation files (AlGoService, or a fake in tests)
+ */
+export interface DocSource {
+  getDocumentationFiles(): Promise<DocFile[]>;
+}
+
+/**
+ * Service for indexing and searching AL-Go documentation.
+ * Documents come from the AlGoService cache; the search index is rebuilt
+ * whenever that cache hands back a new document set.
  */
 export class DocumentIndex {
-  private documents: DocumentEntry[] = [];
-  private isInitialized = false;
-  private lastRefresh: Date | null = null;
-  private loading: Promise<void> | null = null;
+  private indexedDocs: DocFile[] | null = null;
+  private index = new Bm25Index<DocumentEntry>();
 
   /**
-   * Initialize the document index
+   * Make sure the index reflects the current (cached) document set
    */
-  async initialize(alGoService: AlGoService): Promise<void> {
-    if (this.isInitialized && this.lastRefresh &&
-        (Date.now() - this.lastRefresh.getTime()) < 3600000) { // 1 hour cache
-      return;
+  async initialize(source: DocSource): Promise<void> {
+    const docs = await source.getDocumentationFiles();
+    if (docs === this.indexedDocs) return;
+
+    if (docs.length === 0) {
+      throw new Error("No AL-Go documents could be fetched");
     }
 
-    // Concurrent callers share a single in-flight load
-    if (!this.loading) {
-      this.loading = this.load(alGoService).finally(() => { this.loading = null; });
-    }
-    return this.loading;
-  }
-
-  private async load(alGoService: AlGoService): Promise<void> {
-    console.error("Initializing AL-Go document index...");
-
-    try {
-      const docs = await alGoService.getDocumentationFiles();
-      if (docs.length === 0) {
-        throw new Error("No AL-Go documents could be fetched");
-      }
-      this.documents = docs.map(doc => ({
+    const index = new Bm25Index<DocumentEntry>();
+    for (const doc of docs) {
+      const entry: DocumentEntry = {
         path: doc.path,
         content: doc.content,
         name: doc.name,
-        title: this.extractTitle(doc.content, doc.name),
-        lastIndexed: new Date()
-      }));
-
-      this.isInitialized = true;
-      this.lastRefresh = new Date();
-      console.error(`Indexed ${this.documents.length} AL-Go documents`);
-    } catch (error) {
-      console.error("Failed to initialize document index:", error);
-      throw error;
+        title: this.extractTitle(doc.content, doc.name)
+      };
+      index.add(entry, [
+        { text: entry.title, weight: 4 },
+        { text: entry.path, weight: 3 },
+        { text: this.extractHeadings(doc.content), weight: 2 },
+        { text: doc.content, weight: 1 }
+      ]);
     }
+
+    this.index = index;
+    this.indexedDocs = docs;
+    console.error(`Indexed ${index.size} AL-Go documents`);
   }
 
   /**
    * Search through the indexed documents, loading the index on first use
    */
-  async search(alGoService: AlGoService, query: string, limit: number = 10): Promise<SearchResult[]> {
-    await this.initialize(alGoService);
+  async search(source: DocSource, query: string, limit: number = 10): Promise<SearchResult[]> {
+    await this.initialize(source);
 
-    const lowerQuery = query.toLowerCase();
-    const results: SearchResult[] = [];
-
-    // Search through all documents
-    for (const doc of this.documents) {
-      const score = this.calculateRelevanceScore(doc, lowerQuery);
-      
-      if (score > 0) {
-        const excerpt = this.extractExcerpt(doc.content, lowerQuery);
-        
-        results.push({
-          title: doc.title,
-          path: doc.path,
-          excerpt: excerpt,
-          score: score,
-          content: doc.content.substring(0, 1000) // Limit content to avoid overwhelming responses
-        });
-      }
-    }
-
-    // Sort by relevance score (descending) and limit results
-    results.sort((a, b) => b.score - a.score);
-    return results.slice(0, limit);
-  }
-
-  /**
-   * Refresh the document index
-   */
-  async refresh(alGoService: AlGoService, force: boolean = false): Promise<void> {
-    if (force || !this.lastRefresh || 
-        (Date.now() - this.lastRefresh.getTime()) > 3600000) { // 1 hour cache
-      this.isInitialized = false;
-      await this.initialize(alGoService);
-    }
+    return this.index.search(query, limit).map(({ item, score }) => ({
+      title: item.title,
+      path: item.path,
+      excerpt: this.extractExcerpt(item.content, query),
+      score,
+      content: item.content.substring(0, 1000) // Limit content to avoid overwhelming responses
+    }));
   }
 
   /**
@@ -129,87 +100,36 @@ export class DocumentIndex {
   }
 
   /**
-   * Calculate relevance score for a document given a query
+   * All markdown headings, used as a boosted search field
    */
-  private calculateRelevanceScore(doc: DocumentEntry, lowerQuery: string): number {
-    let score = 0;
-    const lowerContent = doc.content.toLowerCase();
-    const lowerTitle = doc.title.toLowerCase();
-    const lowerPath = doc.path.toLowerCase();
-
-    // Exact matches in title get highest score
-    if (lowerTitle.includes(lowerQuery)) {
-      score += 10;
-    }
-
-    // Matches in path get medium score
-    if (lowerPath.includes(lowerQuery)) {
-      score += 5;
-    }
-
-    // Word matches in content
-    const queryWords = lowerQuery.split(/\s+/);
-    for (const word of queryWords) {
-      if (word.length > 2) { // Ignore very short words
-        // Escape regex metacharacters so queries like "c++" or "(build" can't throw
-        const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const wordRegex = new RegExp(`\\b${escaped}\\b`, 'gi');
-        const matches = (lowerContent.match(wordRegex) || []).length;
-        score += matches * 0.5;
-
-        // Bonus for matches in headings
-        const headingMatches = (lowerContent.match(new RegExp(`^#+.*${escaped}.*$`, 'gmi')) || []).length;
-        score += headingMatches * 2;
-      }
-    }
-
-    // Bonus for AL-Go specific terms
-    const alGoTerms = ['al-go', 'business central', 'workflow', 'actions', 'templates', 'devops'];
-    for (const term of alGoTerms) {
-      if (lowerQuery.includes(term) && lowerContent.includes(term)) {
-        score += 1;
-      }
-    }
-
-    return score;
+  private extractHeadings(content: string): string {
+    return (content.match(/^#+\s+.+$/gm) || []).join('\n');
   }
 
   /**
-   * Extract a relevant excerpt from the document content
+   * Extract the line with the most query terms, plus surrounding context
    */
-  private extractExcerpt(content: string, lowerQuery: string, maxLength: number = 200): string {
-    const lowerContent = content.toLowerCase();
-    const queryWords = lowerQuery.split(/\s+/);
-    
-    // Find the first occurrence of any query word
-    let bestIndex = -1;
-    for (const word of queryWords) {
-      if (word.length > 2) {
-        const index = lowerContent.indexOf(word);
-        if (index !== -1 && (bestIndex === -1 || index < bestIndex)) {
-          bestIndex = index;
-        }
+  private extractExcerpt(content: string, query: string, maxLength: number = 200): string {
+    const terms = new Set(tokenize(query));
+    const lines = content.split('\n');
+
+    let bestLine = -1;
+    let bestHits = 0;
+    lines.forEach((line, i) => {
+      if (/^\s*(#|!\[|<)/.test(line)) return; // skip headings, images, HTML
+      const hits = new Set(tokenize(line).filter(t => terms.has(t))).size;
+      if (hits > bestHits) {
+        bestHits = hits;
+        bestLine = i;
       }
-    }
+    });
 
-    if (bestIndex === -1) {
-      // No match found, return beginning of content
-      return content.substring(0, maxLength).trim() + (content.length > maxLength ? '...' : '');
-    }
+    const text = (bestLine === -1 ? lines : lines.slice(bestLine))
+      .join(' ')
+      .replace(/\s+/g, ' ')
+      .trim();
 
-    // Extract excerpt around the match
-    const start = Math.max(0, bestIndex - 50);
-    const end = Math.min(content.length, start + maxLength);
-    
-    let excerpt = content.substring(start, end);
-    
-    // Clean up the excerpt
-    excerpt = excerpt.replace(/\n+/g, ' ').trim();
-    
-    // Add ellipsis if we're not at the beginning/end
-    if (start > 0) excerpt = '...' + excerpt;
-    if (end < content.length) excerpt = excerpt + '...';
-    
-    return excerpt;
+    const excerpt = text.substring(0, maxLength);
+    return (bestLine > 0 ? '...' : '') + excerpt + (text.length > maxLength ? '...' : '');
   }
 }

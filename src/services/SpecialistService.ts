@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
+import { Bm25Index, Ranked } from "./TextSearch.js";
 
 /**
  * Specialist interface
@@ -22,6 +23,7 @@ export interface Specialist {
  */
 export class SpecialistService {
   private specialists: Specialist[] = [];
+  private routingIndex?: Bm25Index<Specialist>;
 
   constructor() {
     this.loadSpecialists();
@@ -59,20 +61,32 @@ export class SpecialistService {
   }
 
   /**
-   * Search specialists by query
+   * Rank specialists for a free-text question, best match first.
+   * Specialists sharing no terms with the question are omitted.
+   */
+  route(question: string): Ranked<Specialist>[] {
+    if (!this.routingIndex) {
+      // Low length normalisation: a specialist with a longer expertise list shouldn't be penalised
+      this.routingIndex = new Bm25Index<Specialist>(1.2, 0.3);
+      for (const s of this.specialists) {
+        // Keywords are the curated routing signal; descriptive text is grouped in one
+        // low-weight field so a term repeated across name/expertise/description doesn't
+        // outweigh a rarer, more specific keyword (e.g. "error" -> Rex over "build" -> Bruno)
+        this.routingIndex.add(s, [
+          { text: s.persona ?? '', weight: 6 },
+          { text: s.keywords.join(' '), weight: 4 },
+          { text: `${s.name} ${s.expertise.join(' ')} ${s.description}`, weight: 1 }
+        ]);
+      }
+    }
+    return this.routingIndex.search(question);
+  }
+
+  /**
+   * Search specialists by query (ranked)
    */
   search(query: string): Specialist[] {
-    const lowerQuery = query.toLowerCase();
-
-    return this.specialists.filter(specialist => {
-      const matchesName = specialist.name.toLowerCase().includes(lowerQuery);
-      const matchesPersona = specialist.persona?.toLowerCase().includes(lowerQuery) ?? false;
-      const matchesDescription = specialist.description.toLowerCase().includes(lowerQuery);
-      const matchesExpertise = specialist.expertise.some(e => e.toLowerCase().includes(lowerQuery));
-      const matchesKeywords = specialist.keywords.some(k => k.toLowerCase().includes(lowerQuery));
-
-      return matchesName || matchesPersona || matchesDescription || matchesExpertise || matchesKeywords;
-    });
+    return this.route(query).map(r => r.item);
   }
 
   /**

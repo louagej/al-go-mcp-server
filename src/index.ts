@@ -16,6 +16,9 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
+// alg-ask routes here when a question matches no specialist
+const FALLBACK_SPECIALIST_ID = "alg-casey";
+
 // Handle command line arguments
 const args = process.argv.slice(2);
 if (args.includes('--version') || args.includes('-v')) {
@@ -95,7 +98,7 @@ async function main() {
 
     function getAlGoService(): AlGoService {
       if (!alGoService) {
-        alGoService = new AlGoService();
+        alGoService = new AlGoService(getCacheManager());
       }
       return alGoService;
     }
@@ -116,7 +119,7 @@ async function main() {
 
     function getDiscussionService(): DiscussionService {
       if (!discussionService) {
-        discussionService = new DiscussionService(getAlGoService().getOctokit());
+        discussionService = new DiscussionService(getAlGoService().getOctokit(), getCacheManager(), getAlGoService().isAuthenticated());
       }
       return discussionService;
     }
@@ -148,6 +151,51 @@ async function main() {
       }
       return knowledgeGraphAPI;
     }
+
+    /**
+     * Load all knowledge sources from the cache. A source that fails (e.g. discussions
+     * without a token) is skipped with a warning instead of failing the whole request.
+     */
+    async function loadKnowledgeSources() {
+      const [workshops, scenarios, discussions, issues] = await Promise.allSettled([
+        getAlGoService().getWorkshopFiles(),
+        getAlGoService().getScenarios(),
+        getDiscussionService().fetchDiscussions(50),
+        getAlGoService().getResolvedIssues(100)
+      ]);
+      const warnings: string[] = [];
+      const valueOf = <T>(result: PromiseSettledResult<T[]>, label: string): T[] => {
+        if (result.status === 'fulfilled') return result.value;
+        warnings.push(`${label} skipped: ${result.reason instanceof Error ? result.reason.message : result.reason}`);
+        return [];
+      };
+      return {
+        sources: {
+          workshops: valueOf(workshops, 'Workshops'),
+          scenarios: valueOf(scenarios, 'Scenarios'),
+          discussions: valueOf(discussions, 'Discussions'),
+          issues: valueOf(issues, 'Issues')
+        },
+        warnings
+      };
+    }
+
+    let knowledgeGraphBuilt = false;
+    async function buildKnowledgeGraph(): Promise<string[]> {
+      const { sources, warnings } = await loadKnowledgeSources();
+      await getKnowledgeGraphService().buildKnowledgeGraph(
+        getSpecialistService().getAll(),
+        sources.workshops,
+        sources.scenarios,
+        sources.discussions,
+        sources.issues
+      );
+      knowledgeGraphBuilt = true;
+      return warnings;
+    }
+
+    const formatWarnings = (warnings: string[]) =>
+      warnings.length > 0 ? `\n\n> ${warnings.join('\n> ')}` : '';
 
 // Resource: Get server version information
 server.registerResource(
@@ -372,18 +420,22 @@ server.registerTool(
   "alg-refresh-cache",
   {
     title: "Refresh AL-Go Documentation Cache",
-    description: "Refresh the cached AL-Go documentation from the repository",
+    description: "Load the AL-Go documentation index (cached for 24 hours). Use force=true to re-download it from the repository.",
     inputSchema: {
-      force: z.boolean().default(false).describe("Force refresh even if cache is recent")
+      force: z.boolean().default(false).describe("Discard the cached documentation and re-download it")
     }
   },
   async ({ force }) => {
     try {
-      await getDocumentIndex().refresh(getAlGoService(), force);
+      if (force) {
+        getCacheManager().clearSource('docs');
+      }
+      await getDocumentIndex().initialize(getAlGoService());
+      const docCount = (await getAlGoService().getDocumentationFiles()).length;
       return {
         content: [{
           type: "text",
-          text: "AL-Go documentation cache refreshed successfully."
+          text: `AL-Go documentation index ${force ? 'refreshed' : 'ready'}: ${docCount} documents.`
         }]
       };
     } catch (error) {
@@ -537,21 +589,34 @@ server.registerTool(
     try {
       const svc = getSpecialistService();
 
-      // Resolve specialist: explicit persona name, or auto-detect from question
+      // Resolve specialist: explicit persona name, or the best match for the question
+      const ranked = svc.route(question);
       let found = specialist ? svc.getByPersona(specialist) : undefined;
+      let routingNote = '';
       if (!found) {
-        const results = svc.search(question);
-        found = results[0];
+        found = ranked[0]?.item;
       }
-
+      if (!found) {
+        // Nothing in the question matched any specialist; Casey covers AL-Go pipelines end to end
+        found = svc.getById(FALLBACK_SPECIALIST_ID);
+        routingNote = `\n\n_No specialist matched this question closely, so it was routed to ${found?.persona}. Use \`alg-list-specialists\` to pick a specific one._`;
+      }
       if (!found) {
         return {
           content: [{
             type: "text",
-            text: `No matching specialist found. Use \`#alg-list-specialists\` to browse all available specialists and their persona names.`
+            text: `No matching specialist found. Use \`alg-list-specialists\` to browse all available specialists and their persona names.`
           }],
           isError: true
         };
+      }
+
+      const alternatives = ranked
+        .filter(r => r.item.id !== found!.id)
+        .slice(0, 2)
+        .map(r => `**${r.item.persona ?? r.item.name}** (${r.item.name})`);
+      if (alternatives.length > 0) {
+        routingNote += `\n**Other specialists for this question:** ${alternatives.join(', ')}`;
       }
 
       const avatarLine = found.avatarUrl
@@ -581,7 +646,7 @@ ${expertise}
 
 **Keywords:** ${found.keywords.join(', ')}
 **Related scenarios:** ${scenarios}
-**Related workflows:** ${workflows}${relatedText}`
+**Related workflows:** ${workflows}${relatedText}${routingNote}`
         }]
       };
     } catch (error) {
@@ -601,7 +666,7 @@ server.registerTool(
   "alg-search-discussions",
   {
     title: "Search AL-Go GitHub Discussions",
-    description: "Search for relevant discussions in the AL-Go repository",
+    description: "Search the 50 most recently active GitHub Discussions in the AL-Go repository. Requires a GitHub token.",
     inputSchema: {
       query: z.string().describe("Search query for discussions"),
       limit: z.number().int().min(1).max(50).default(10).describe("Maximum number of results to return")
@@ -690,7 +755,7 @@ server.registerTool(
   "alg-search-issues",
   {
     title: "Search AL-Go Resolved Issues",
-    description: "Search for tips and tricks in resolved AL-Go issues",
+    description: "Search the 100 most recently closed AL-Go issues for tips and workarounds",
     inputSchema: {
       query: z.string().describe("Search query for issues"),
       limit: z.number().int().min(1).max(50).default(10).describe("Maximum number of results to return")
@@ -743,6 +808,17 @@ server.registerTool(
   },
   async ({ specialistId }) => {
     try {
+      if (!getSpecialistService().getById(specialistId)) {
+        return {
+          content: [{
+            type: "text",
+            text: `Specialist not found: ${specialistId}. Use 'alg-list-specialists' to see available specialists.`
+          }],
+          isError: true
+        };
+      }
+
+      const warnings = knowledgeGraphBuilt ? [] : await buildKnowledgeGraph();
       const knowledge = getKnowledgeGraphService().getSpecialistKnowledge(specialistId);
 
       if (!knowledge) {
@@ -760,7 +836,7 @@ server.registerTool(
       return {
         content: [{
           type: "text",
-          text: formattedKnowledge
+          text: formattedKnowledge + formatWarnings(warnings)
         }]
       };
     } catch (error) {
@@ -786,20 +862,7 @@ server.registerTool(
   async () => {
     try {
       console.error("Building knowledge graph...");
-
-      const specialists = getSpecialistService().getAll();
-      const workshops = await getAlGoService().getWorkshopFiles();
-      const scenarios = await getAlGoService().getScenarios();
-      const discussions = await getDiscussionService().fetchDiscussions(20);
-      const issues = await getAlGoService().getResolvedIssues(20);
-
-      await getKnowledgeGraphService().buildKnowledgeGraph(
-        specialists,
-        workshops,
-        scenarios,
-        discussions,
-        issues
-      );
+      const warnings = await buildKnowledgeGraph();
 
       const stats = getKnowledgeGraphService().getStats();
       const statsText = Object.entries(stats.specialistStats)
@@ -810,7 +873,7 @@ server.registerTool(
       return {
         content: [{
           type: "text",
-          text: `Knowledge graph built successfully!\n\nTotal Specialists: ${stats.totalSpecialists}\n\nTop Specialists:\n${statsText}`
+          text: `Knowledge graph built successfully!\n\nTotal Specialists: ${stats.totalSpecialists}\n\nTop Specialists:\n${statsText}${formatWarnings(warnings)}`
         }]
       };
     } catch (error) {
@@ -842,24 +905,14 @@ server.registerTool(
     try {
       const semanticSearch = getSemanticSearchService();
 
-      // Fetch knowledge from all sources (in production, would use cache)
-      const workshops = await getAlGoService().getWorkshopFiles();
-      const scenarios = await getAlGoService().getScenarios();
-      const discussions = await getDiscussionService().fetchDiscussions(20);
-      const issues = await getAlGoService().getResolvedIssues(20);
-
-      const results = semanticSearch.search(
-        query,
-        { workshops, scenarios, discussions, issues },
-        limit
-      );
-
+      const { sources, warnings } = await loadKnowledgeSources();
+      const results = semanticSearch.search(query, sources, limit);
       const resultText = semanticSearch.formatResults(results);
 
       return {
         content: [{
           type: "text",
-          text: resultText
+          text: resultText + formatWarnings(warnings)
         }]
       };
     } catch (error) {
@@ -986,23 +1039,16 @@ server.registerTool(
   "alg-clear-cache",
   {
     title: "Clear Cache",
-    description: "Clear cached knowledge sources or entire cache",
+    description: "Clear cached GitHub data so the next request re-downloads it. 'docs' covers documentation, scenarios and workshops.",
     inputSchema: {
-      source: z.enum(["workshop", "scenario", "discussion", "issue", "all"]).default("all").describe("Cache source to clear")
+      source: z.enum(["docs", "discussion", "issue", "all"]).default("all").describe("Cache source to clear")
     }
   },
   async ({ source }) => {
     try {
       const cache = getCacheManager();
-
-      let message = '';
-      if (source === 'all') {
-        cache.clearAll();
-        message = 'All cache cleared successfully';
-      } else {
-        const count = cache.clearSource(source);
-        message = `Cleared ${count} item(s) from ${source} cache`;
-      }
+      const count = source === 'all' ? cache.clearAll() : cache.clearSource(source);
+      const message = `Cleared ${count} item(s) from ${source === 'all' ? 'all caches' : `${source} cache`}`;
 
       return {
         content: [{
