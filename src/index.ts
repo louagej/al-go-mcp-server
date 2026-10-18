@@ -42,6 +42,10 @@ Usage:
 
 Environment Variables:
   GITHUB_TOKEN                      Optional GitHub token for higher rate limits
+                                    and discussion search
+  AL_GO_MCP_GITHUB_TOKEN            Alternative to GITHUB_TOKEN (used if GITHUB_TOKEN is not set)
+  AL_GO_MCP_INSTALL_AGENTS=true     Write the @alg-* specialist agent files to the
+                                    VS Code user prompts folder at startup
 
 For more information, visit: https://github.com/louagej/al-go-mcp-server
 `);
@@ -271,14 +275,22 @@ server.registerTool(
     description: "Search through AL-Go documentation for specific queries",
     inputSchema: {
       query: z.string().describe("Search query for AL-Go documentation"),
-      limit: z.number().default(10).describe("Maximum number of results to return")
+      limit: z.number().int().min(1).max(50).default(10).describe("Maximum number of results to return")
     }
   },
   async ({ query, limit }) => {
     try {
-      // Use direct API search instead of indexing
-      const results = await getDocumentIndex().search(query, limit);
-      
+      const results = await getDocumentIndex().search(getAlGoService(), query, limit);
+
+      if (results.length === 0) {
+        return {
+          content: [{
+            type: "text",
+            text: `No AL-Go documentation found for "${query}". Try different or fewer keywords.`
+          }]
+        };
+      }
+
       const resultText = results.map((result: any, index: number) => 
         `${index + 1}. **${result.title}** (${result.path})\n   ${result.excerpt}\n   Score: ${result.score.toFixed(2)}\n`
       ).join('\n');
@@ -592,7 +604,7 @@ server.registerTool(
     description: "Search for relevant discussions in the AL-Go repository",
     inputSchema: {
       query: z.string().describe("Search query for discussions"),
-      limit: z.number().default(10).describe("Maximum number of results to return")
+      limit: z.number().int().min(1).max(50).default(10).describe("Maximum number of results to return")
     }
   },
   async ({ query, limit }) => {
@@ -681,7 +693,7 @@ server.registerTool(
     description: "Search for tips and tricks in resolved AL-Go issues",
     inputSchema: {
       query: z.string().describe("Search query for issues"),
-      limit: z.number().default(10).describe("Maximum number of results to return")
+      limit: z.number().int().min(1).max(50).default(10).describe("Maximum number of results to return")
     }
   },
   async ({ query, limit }) => {
@@ -823,7 +835,7 @@ server.registerTool(
     description: "Intelligent cross-source search across workshops, scenarios, discussions, and issues using relevance scoring",
     inputSchema: {
       query: z.string().describe("Search query"),
-      limit: z.number().default(10).describe("Maximum results to return")
+      limit: z.number().int().min(1).max(50).default(10).describe("Maximum results to return")
     }
   },
   async ({ query, limit }) => {
@@ -1050,7 +1062,10 @@ Use the AL-Go documentation and examples available through the MCP tools to prov
     // Start the server with stdio transport
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    bootstrapAgentFiles();
+    // Writing into the user's global VS Code profile is opt-in
+    if (process.env.AL_GO_MCP_INSTALL_AGENTS === 'true') {
+      bootstrapAgentFiles();
+    }
     console.error(`AL-Go MCP Server v${packageJson.version} is running on stdio`);
   } catch (error) {
     console.error("Failed to start AL-Go MCP Server:", error);

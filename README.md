@@ -93,6 +93,20 @@ Provide a GitHub token for higher rate limits, and to enable discussion and issu
 }
 ```
 
+`AL_GO_MCP_GITHUB_TOKEN` is accepted as an alternative to `GITHUB_TOKEN`.
+
+### Specialist Agents in Copilot Chat (Optional)
+
+Set `AL_GO_MCP_INSTALL_AGENTS` to `true` to have the server write the 16 `@alg-*` specialist agent files to your VS Code user prompts folder at startup (e.g. `%APPDATA%\Code\User\prompts` on Windows), so they appear in the Copilot Chat agent picker in every workspace:
+
+```json
+"env": {
+  "AL_GO_MCP_INSTALL_AGENTS": "true"
+}
+```
+
+The agent files call the server's tools as `al-go-docs/*`, so keep `al-go-docs` as the server name.
+
 ### Command Line (Advanced)
 
 ```bash
@@ -122,7 +136,7 @@ npx --yes al-go-mcp-server@latest
 | `alg-get-specialist` | Get detailed profile for a specific specialist |
 | `alg-ask` | Ask a specialist by persona name — routes your question with avatar context |
 
-> **Tip:** Address specialists directly in chat: `@alg-freddy my dev environment can't be reached` — Copilot will call `alg-ask` and Freddy responds with his avatar and expertise.
+> **Tip:** Address specialists directly in chat: `@alg-freddy my dev environment can't be reached` — Copilot will call `alg-ask` and Freddy responds with his avatar and expertise. This requires the agent files; see [Specialist Agents in Copilot Chat](#specialist-agents-in-copilot-chat-optional).
 
 ### Knowledge Sources
 
