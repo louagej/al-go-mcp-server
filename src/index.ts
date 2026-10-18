@@ -12,7 +12,8 @@ import { KnowledgeGraphService } from "./services/KnowledgeGraphService.js";
 import { CacheManager } from "./services/CacheManager.js";
 import { SemanticSearchService } from "./services/SemanticSearchService.js";
 import { KnowledgeGraphAPI } from "./services/KnowledgeGraphAPI.js";
-import { installAgents, parseAgentTargets, formatInstallResults } from "./services/AgentInstaller.js";
+import { installAgents, parseAgentTargets, formatInstallResults, findOutdatedTargets } from "./services/AgentInstaller.js";
+import { checkForUpdate, detectInstallMethod, formatUpdateNotice } from "./services/UpdateChecker.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -40,7 +41,7 @@ if (installArg) {
     console.error('Unknown target. Use --install-agents, --install-agents=claude or --install-agents=vscode');
     process.exit(1);
   }
-  console.log(formatInstallResults(installAgents(new SpecialistService().getAll(), targets)));
+  console.log(formatInstallResults(installAgents(new SpecialistService().getAll(), targets, getPackageVersion().version)));
   process.exit(0);
 }
 
@@ -64,6 +65,7 @@ Environment Variables:
   AL_GO_MCP_GITHUB_TOKEN            Alternative to GITHUB_TOKEN (used if GITHUB_TOKEN is not set)
   AL_GO_MCP_INSTALL_AGENTS          Install/update the specialist agents at every start:
                                     true (all detected clients), claude or vscode
+  AL_GO_MCP_UPDATE_CHECK=off        Don't check npm for a newer version at startup
 
 For more information, visit: https://github.com/louagej/al-go-mcp-server
 `);
@@ -100,6 +102,21 @@ async function main() {
       name: "al-go-mcp-server",
       version: packageJson.version
     });
+
+    // One-time notices (available update, refreshed agent files) are appended to the
+    // next tool result, so the user sees them in chat without an extra tool call
+    const pendingNotices: string[] = [];
+    let updateCheckStatus = 'not checked';
+    const originalRegisterTool = server.registerTool.bind(server) as (...args: any[]) => any;
+    (server as any).registerTool = (name: string, config: unknown, handler: (...args: any[]) => Promise<any>) =>
+      originalRegisterTool(name, config, async (...args: any[]) => {
+        const result = await handler(...args);
+        if (pendingNotices.length > 0 && Array.isArray(result?.content)) {
+          result.content.push({ type: "text", text: `---\n${pendingNotices.map(n => `ℹ️ ${n}`).join('\n')}` });
+          pendingNotices.length = 0;
+        }
+        return result;
+      });
 
     // Initialize services lazily to avoid startup messages for --version/--help
     let alGoService: AlGoService;
@@ -424,7 +441,7 @@ server.registerTool(
     return {
       content: [{
         type: "text",
-        text: `AL-Go MCP Server v${packageJson.version}\n\nAuthor: ${packageJson.author}\nDescription: ${packageJson.description}\nRepository: ${packageJson.repository?.url || 'N/A'}`
+        text: `AL-Go MCP Server v${packageJson.version}\n\nUpdate check: ${updateCheckStatus}\nAuthor: ${packageJson.author}\nDescription: ${packageJson.description}\nRepository: ${packageJson.repository?.url || 'N/A'}`
       }]
     };
   }
@@ -1123,12 +1140,43 @@ Use the AL-Go documentation and examples available through the MCP tools to prov
     // Start the server with stdio transport
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    // Writing into the user's global VS Code / Claude Code profile is opt-in
-    const agentTargets = parseAgentTargets(process.env.AL_GO_MCP_INSTALL_AGENTS);
+    // Writing into the user's global VS Code / Claude Code profile is opt-in: either
+    // AL_GO_MCP_INSTALL_AGENTS, or agent files installed earlier that are now outdated
+    const specialists = new SpecialistService().getAll();
+    const outdatedTargets = findOutdatedTargets(specialists, packageJson.version);
+    const agentTargets = [...new Set([...parseAgentTargets(process.env.AL_GO_MCP_INSTALL_AGENTS), ...outdatedTargets])];
     if (agentTargets.length > 0) {
-      const results = installAgents(new SpecialistService().getAll(), agentTargets);
-      console.error(`AL-Go MCP Server: agent install
-${formatInstallResults(results)}`);
+      const results = installAgents(specialists, agentTargets, packageJson.version);
+      console.error(`AL-Go MCP Server: agent install\n${formatInstallResults(results)}`);
+      for (const r of results) {
+        if (outdatedTargets.includes(r.target) && r.written > 0) {
+          pendingNotices.push(r.target === 'claude'
+            ? `Updated the AL-Go specialist agents for Claude Code to v${packageJson.version}. Start a new Claude Code session to load them.`
+            : `Updated the AL-Go specialist agents for VS Code Copilot Chat to v${packageJson.version}. Reload the VS Code window to load them.`);
+        }
+      }
+    }
+
+    // Non-blocking update check; never delays startup or fails offline
+    const installMethod = detectInstallMethod(path.dirname(fileURLToPath(import.meta.url)));
+    const updateCheckSetting = (process.env.AL_GO_MCP_UPDATE_CHECK ?? '').toLowerCase();
+    if (updateCheckSetting === 'off') {
+      updateCheckStatus = 'disabled (AL_GO_MCP_UPDATE_CHECK=off)';
+    } else if (installMethod === 'source' && updateCheckSetting !== 'force') {
+      updateCheckStatus = 'skipped (running from source)';
+    } else {
+      updateCheckStatus = 'checking...';
+      void checkForUpdate(packageJson.name, packageJson.version, { registry: process.env.npm_config_registry })
+        .then(latest => {
+          if (latest) {
+            const notice = formatUpdateNotice(packageJson.name, packageJson.version, latest, installMethod);
+            updateCheckStatus = notice;
+            pendingNotices.push(notice);
+            console.error(`AL-Go MCP Server: ${notice}`);
+          } else {
+            updateCheckStatus = 'up to date (or registry unreachable)';
+          }
+        });
     }
     console.error(`AL-Go MCP Server v${packageJson.version} is running on stdio`);
   } catch (error) {
