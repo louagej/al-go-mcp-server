@@ -20,12 +20,15 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: '20'
+          # Node 24 (LTS); the npm releases below no longer support Node 20
+          node-version: '24'
           cache: 'npm'
           registry-url: 'https://registry.npmjs.org'
           
-      - name: Update npm to latest version
-        run: npm install -g npm@latest
+      # npm 11.5.1+ is needed for trusted publishing (OIDC). Pinned to a major so a
+      # new npm release can't break publishing (npm 12 dropped Node 20 overnight).
+      - name: Update npm
+        run: npm install -g npm@11
         
       - name: Install dependencies
         run: npm ci
