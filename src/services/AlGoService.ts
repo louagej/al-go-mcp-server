@@ -49,20 +49,20 @@ export class AlGoService {
         installationId: githubInstallationId,
         userAgent
       });
-      console.log("AL-Go MCP Server: Using GitHub App authentication");
+      console.error("AL-Go MCP Server: Using GitHub App authentication");
     } else if (githubToken) {
       // Fallback to personal token
       this.octokit = new Octokit({
         auth: githubToken,
         userAgent
       });
-      console.log("AL-Go MCP Server: Using personal token authentication");
+      console.error("AL-Go MCP Server: Using personal token authentication");
     } else {
       // No authentication
       this.octokit = new Octokit({
         userAgent
       });
-      console.log("AL-Go MCP Server: Using unauthenticated requests (rate limited)");
+      console.error("AL-Go MCP Server: Using unauthenticated requests (rate limited)");
     }
   }
 
@@ -124,6 +124,18 @@ export class AlGoService {
   }
 
   /**
+   * Get raw file content from raw.githubusercontent.com (not subject to the REST API rate limit)
+   */
+  private async getRawContent(path: string): Promise<string> {
+    const url = `https://raw.githubusercontent.com/${this.owner}/${this.repo}/main/${encodeURI(path)}`;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status} for ${path}`);
+    }
+    return response.text();
+  }
+
+  /**
    * Get all documentation files from the repository
    */
   async getDocumentationFiles(): Promise<Array<{ path: string; content: string; name: string }>> {
@@ -138,37 +150,29 @@ export class AlGoService {
         recursive: "true"
       });
 
-      // Filter for documentation files (markdown, txt, and specific documentation directories)
-      const docFiles = tree.tree.filter(item => 
-        item.type === 'blob' && 
-        item.path && (
-          item.path.endsWith('.md') ||
-          item.path.endsWith('.txt') ||
-          item.path.includes('Actions/') ||
-          item.path.includes('Scenarios/') ||
-          item.path.includes('Workshop/') ||
-          item.path.includes('Documentation/') ||
-          item.path === 'README.md' ||
-          item.path === 'RELEASENOTES.md'
-        )
-      );
+      // Markdown documentation only; skip repo housekeeping files
+      const excluded = ['CODE_OF_CONDUCT.md', 'SECURITY.md', 'SUPPORT.md'];
+      const docPaths = tree.tree
+        .filter(item => item.type === 'blob' && item.path?.endsWith('.md'))
+        .map(item => item.path as string)
+        .filter(p => !p.startsWith('.github/') && !excluded.includes(p))
+        .slice(0, 200);
 
-      // Fetch content for each documentation file (limit to avoid API rate limits)
-      const maxFiles = 50; // Reasonable limit for initial implementation
-      for (let i = 0; i < Math.min(docFiles.length, maxFiles); i++) {
-        const file = docFiles[i];
-        if (file.path) {
+      // Fetch raw content in small parallel batches. raw.githubusercontent.com
+      // does not count against the REST API rate limit (60/hour unauthenticated).
+      const batchSize = 8;
+      for (let i = 0; i < docPaths.length; i += batchSize) {
+        const batch = docPaths.slice(i, i + batchSize);
+        const results = await Promise.all(batch.map(async filePath => {
           try {
-            const content = await this.getDocumentContent(file.path);
-            docs.push({
-              path: file.path,
-              content: content,
-              name: file.path.split('/').pop() || file.path
-            });
+            return { path: filePath, content: await this.getRawContent(filePath), name: filePath.split('/').pop() || filePath };
           } catch (error) {
-            console.error(`Failed to fetch ${file.path}:`, error);
-            // Continue with other files
+            console.error(`Failed to fetch ${filePath}:`, error);
+            return undefined;
           }
+        }));
+        for (const doc of results) {
+          if (doc) docs.push(doc);
         }
       }
 

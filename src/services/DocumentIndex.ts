@@ -23,20 +23,32 @@ export class DocumentIndex {
   private documents: DocumentEntry[] = [];
   private isInitialized = false;
   private lastRefresh: Date | null = null;
+  private loading: Promise<void> | null = null;
 
   /**
    * Initialize the document index
    */
   async initialize(alGoService: AlGoService): Promise<void> {
-    if (this.isInitialized && this.lastRefresh && 
+    if (this.isInitialized && this.lastRefresh &&
         (Date.now() - this.lastRefresh.getTime()) < 3600000) { // 1 hour cache
       return;
     }
 
+    // Concurrent callers share a single in-flight load
+    if (!this.loading) {
+      this.loading = this.load(alGoService).finally(() => { this.loading = null; });
+    }
+    return this.loading;
+  }
+
+  private async load(alGoService: AlGoService): Promise<void> {
     console.error("Initializing AL-Go document index...");
-    
+
     try {
       const docs = await alGoService.getDocumentationFiles();
+      if (docs.length === 0) {
+        throw new Error("No AL-Go documents could be fetched");
+      }
       this.documents = docs.map(doc => ({
         path: doc.path,
         content: doc.content,
@@ -55,18 +67,10 @@ export class DocumentIndex {
   }
 
   /**
-   * Search through the indexed documents
+   * Search through the indexed documents, loading the index on first use
    */
-  async search(query: string, limit: number = 10): Promise<SearchResult[]> {
-    if (!this.isInitialized || this.documents.length === 0) {
-      return [{
-        title: "No documents available",
-        path: "error",
-        excerpt: "Document index not initialized. Please try again in a moment.",
-        score: 0,
-        content: "The document index is still being loaded. Please wait a moment and try your search again."
-      }];
-    }
+  async search(alGoService: AlGoService, query: string, limit: number = 10): Promise<SearchResult[]> {
+    await this.initialize(alGoService);
 
     const lowerQuery = query.toLowerCase();
     const results: SearchResult[] = [];
@@ -147,12 +151,14 @@ export class DocumentIndex {
     const queryWords = lowerQuery.split(/\s+/);
     for (const word of queryWords) {
       if (word.length > 2) { // Ignore very short words
-        const wordRegex = new RegExp(`\\b${word}\\b`, 'gi');
+        // Escape regex metacharacters so queries like "c++" or "(build" can't throw
+        const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const wordRegex = new RegExp(`\\b${escaped}\\b`, 'gi');
         const matches = (lowerContent.match(wordRegex) || []).length;
         score += matches * 0.5;
 
         // Bonus for matches in headings
-        const headingMatches = (lowerContent.match(new RegExp(`^#+.*${word}.*$`, 'gmi')) || []).length;
+        const headingMatches = (lowerContent.match(new RegExp(`^#+.*${escaped}.*$`, 'gmi')) || []).length;
         score += headingMatches * 2;
       }
     }
