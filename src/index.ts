@@ -12,6 +12,7 @@ import { KnowledgeGraphService } from "./services/KnowledgeGraphService.js";
 import { CacheManager } from "./services/CacheManager.js";
 import { SemanticSearchService } from "./services/SemanticSearchService.js";
 import { KnowledgeGraphAPI } from "./services/KnowledgeGraphAPI.js";
+import { installAgents, parseAgentTargets, formatInstallResults } from "./services/AgentInstaller.js";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -32,6 +33,17 @@ if (args.includes('--version') || args.includes('-v')) {
   }
 }
 
+const installArg = args.find(a => a === '--install-agents' || a.startsWith('--install-agents='));
+if (installArg) {
+  const targets = parseAgentTargets(installArg.includes('=') ? installArg.split('=')[1] : 'all');
+  if (targets.length === 0) {
+    console.error('Unknown target. Use --install-agents, --install-agents=claude or --install-agents=vscode');
+    process.exit(1);
+  }
+  console.log(formatInstallResults(installAgents(new SpecialistService().getAll(), targets)));
+  process.exit(0);
+}
+
 if (args.includes('--help') || args.includes('-h')) {
   console.log(`
 AL-Go MCP Server
@@ -42,13 +54,16 @@ Usage:
   npx al-go-mcp-server              Start the MCP server
   npx al-go-mcp-server --version    Show version information
   npx al-go-mcp-server --help       Show this help message
+  npx al-go-mcp-server --install-agents[=claude|vscode]
+                                    Install the 16 @alg-* specialist agents for
+                                    Claude Code and/or VS Code Copilot Chat, then exit
 
 Environment Variables:
   GITHUB_TOKEN                      Optional GitHub token for higher rate limits
                                     and discussion search
   AL_GO_MCP_GITHUB_TOKEN            Alternative to GITHUB_TOKEN (used if GITHUB_TOKEN is not set)
-  AL_GO_MCP_INSTALL_AGENTS=true     Write the @alg-* specialist agent files to the
-                                    VS Code user prompts folder at startup
+  AL_GO_MCP_INSTALL_AGENTS          Install/update the specialist agents at every start:
+                                    true (all detected clients), claude or vscode
 
 For more information, visit: https://github.com/louagej/al-go-mcp-server
 `);
@@ -1108,92 +1123,17 @@ Use the AL-Go documentation and examples available through the MCP tools to prov
     // Start the server with stdio transport
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    // Writing into the user's global VS Code profile is opt-in
-    if (process.env.AL_GO_MCP_INSTALL_AGENTS === 'true') {
-      bootstrapAgentFiles();
+    // Writing into the user's global VS Code / Claude Code profile is opt-in
+    const agentTargets = parseAgentTargets(process.env.AL_GO_MCP_INSTALL_AGENTS);
+    if (agentTargets.length > 0) {
+      const results = installAgents(new SpecialistService().getAll(), agentTargets);
+      console.error(`AL-Go MCP Server: agent install
+${formatInstallResults(results)}`);
     }
     console.error(`AL-Go MCP Server v${packageJson.version} is running on stdio`);
   } catch (error) {
     console.error("Failed to start AL-Go MCP Server:", error);
     process.exit(1);
-  }
-}
-
-/**
- * Detect the VS Code user prompts directory cross-platform.
- * Agent files written here are available globally in all workspaces without touching any project.
- */
-function getVSCodePromptsDir(): string | undefined {
-  const home = process.env.HOME || process.env.USERPROFILE || '';
-  const candidates: string[] = [];
-
-  if (process.platform === 'win32') {
-    const appData = process.env.APPDATA || path.join(home, 'AppData', 'Roaming');
-    candidates.push(
-      path.join(appData, 'Code', 'User', 'prompts'),
-      path.join(appData, 'Code - Insiders', 'User', 'prompts'),
-    );
-  } else if (process.platform === 'darwin') {
-    candidates.push(
-      path.join(home, 'Library', 'Application Support', 'Code', 'User', 'prompts'),
-      path.join(home, 'Library', 'Application Support', 'Code - Insiders', 'User', 'prompts'),
-    );
-  } else {
-    candidates.push(
-      path.join(home, '.config', 'Code', 'User', 'prompts'),
-      path.join(home, '.config', 'Code - Insiders', 'User', 'prompts'),
-    );
-  }
-
-  // Return the first candidate whose parent (...\User\) already exists
-  return candidates.find(p => fs.existsSync(path.dirname(p)));
-}
-
-/**
- * Write AL-Go specialist agent files into the VS Code user prompts directory
- * at server startup, so @alg-* agents are available in Copilot Chat agent mode
- * across all workspaces without touching any project folder.
- */
-function bootstrapAgentFiles(): void {
-  try {
-    const promptsDir = getVSCodePromptsDir();
-    if (!promptsDir) {
-      console.error('AL-Go MCP Server: Could not locate VS Code user directory — skipping agent bootstrap');
-      return;
-    }
-
-    fs.mkdirSync(promptsDir, { recursive: true });
-
-    const specialists = new SpecialistService().getAll();
-    let count = 0;
-
-    for (const s of specialists) {
-      const persona = s.persona ?? s.name;
-      const personaLower = persona.toLowerCase();
-      const filePath = path.join(promptsDir, `${s.id}.agent.md`);
-
-      const content = [
-        `---`,
-        `name: ${s.id}`,
-        `description: "AL-Go ${s.name} — Use when asking about ${s.keywords.join(', ')}."`,
-        `tools: [al-go-docs/*]`,
-        `---`,
-        `You are **${persona}**, the AL-Go ${s.name}.`,
-        ``,
-        `Always start by calling \`#alg-ask\` with \`specialist="${personaLower}"\` and the user's question to get your expert context, then answer using that context.`,
-        ``,
-        `## Expertise`,
-        s.expertise.map((e: string) => `- ${e}`).join('\n'),
-      ].join('\n');
-
-      fs.writeFileSync(filePath, content, 'utf8');
-      count++;
-    }
-
-    console.error(`AL-Go MCP Server: Bootstrapped ${count} specialist agents to ${promptsDir}`);
-  } catch (err) {
-    // Non-fatal — server still works without the agent files
-    console.error(`AL-Go MCP Server: Agent bootstrap failed — ${err instanceof Error ? err.message : err}`);
   }
 }
 
