@@ -11,9 +11,9 @@ A Model Context Protocol (MCP) server that provides intelligent access to [AL-Go
 
 - **Domain Specialists**: 16 AL-Go expert profiles covering every major workflow area (app creation, CI/CD, release management, testing, deployment, and more)
 - **Knowledge Integration**: Links specialists to AL-Go scenarios, workshop content, GitHub Discussions, and resolved Issues
-- **Semantic Search**: Cross-source intelligent search with TF-IDF relevance ranking across all knowledge sources
+- **Ranked Search**: BM25 relevance ranking (with title and path boosts) for documentation, issues, discussions, and cross-source semantic search
 - **Knowledge Graph**: Visualize relationships between specialists and knowledge sources, with cluster detection
-- **Smart Caching**: Per-source TTL caching (workshop/scenario: 24h, discussion: 6h, issue: 12h) with hit/miss statistics
+- **Smart Caching**: One shared cache for all GitHub data (docs: 24h, discussions: 6h, issues: 12h) with hit/miss statistics; documentation is downloaded without using the GitHub API rate limit
 - **AL-Go Documentation**: Search through comprehensive AL-Go guides and workflow templates
 - **Optional Authentication**: GitHub token support for higher rate limits and full API access
 
@@ -125,7 +125,7 @@ npx --yes al-go-mcp-server@latest
 |------|-------------|
 | `alg-search-docs` | Search AL-Go documentation and guides |
 | `alg-get-workflows` | Get AL-Go workflow templates and examples |
-| `alg-refresh-cache` | Force refresh of cached documentation |
+| `alg-refresh-cache` | Load the documentation index, or re-download it with `force` |
 
 ### Specialists
 
@@ -143,7 +143,7 @@ npx --yes al-go-mcp-server@latest
 | Tool | Description |
 |------|-------------|
 | `alg-get-scenarios` | Fetch AL-Go scenario files from the repository |
-| `alg-search-discussions` | Search GitHub Discussions for community Q&A |
+| `alg-search-discussions` | Search GitHub Discussions for community Q&A (requires a GitHub token) |
 | `alg-search-issues` | Search resolved GitHub Issues for tips and workarounds |
 | `alg-get-specialist-knowledge` | Get all knowledge sources linked to a specialist |
 | `alg-build-knowledge-graph` | Build the complete specialist–knowledge graph |
@@ -155,7 +155,7 @@ npx --yes al-go-mcp-server@latest
 | `alg-semantic-search` | Cross-source intelligent search with relevance ranking |
 | `alg-graph-visualization` | Visualize specialist relationships (JSON or text format) |
 | `alg-cache-stats` | View cache hit/miss rates and TTL configuration |
-| `alg-clear-cache` | Clear all, expired, or source-specific cache entries |
+| `alg-clear-cache` | Clear all cached data, or just `docs`, `discussion` or `issue` |
 
 > **Note**: Tools in the Knowledge Sources and Advanced groups that call the GitHub API require a `GITHUB_TOKEN` to be set for full functionality.
 

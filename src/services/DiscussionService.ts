@@ -1,4 +1,6 @@
 import { Octokit } from "@octokit/rest";
+import { CacheManager } from "./CacheManager.js";
+import { Bm25Index } from "./TextSearch.js";
 
 /**
  * Discussion interface
@@ -31,30 +33,36 @@ export class DiscussionService {
   private octokit: Octokit;
   private owner = "microsoft";
   private repo = "AL-Go";
-  private cache: Map<string, { data: Discussion[]; timestamp: number }> = new Map();
-  private cacheMaxAge = 6 * 60 * 60 * 1000; // 6 hours
+  private static readonly FETCH_COUNT = 50;
+  private static readonly TOKEN_REQUIRED = "Reading GitHub Discussions requires a valid GitHub token. Set GITHUB_TOKEN (or AL_GO_MCP_GITHUB_TOKEN) in the MCP server configuration.";
 
-  constructor(octokit: Octokit) {
+  constructor(
+    octokit: Octokit,
+    private readonly cache: CacheManager = new CacheManager(),
+    private readonly authenticated = true
+  ) {
     this.octokit = octokit;
   }
 
   /**
-   * Fetch discussions from AL-Go repository
+   * Get the most recently updated discussions (cached)
    */
   async fetchDiscussions(limit: number = 20): Promise<Discussion[]> {
-    const cacheKey = `discussions-${limit}`;
+    const discussions = await this.cache.getOrLoad('discussion', 'recent', () => this.loadDiscussions());
+    return discussions.slice(0, limit);
+  }
 
-    // Check cache
-    const cached = this.cache.get(cacheKey);
-    if (cached && Date.now() - cached.timestamp < this.cacheMaxAge) {
-      return cached.data;
+  private async loadDiscussions(): Promise<Discussion[]> {
+    // The GraphQL API rejects all unauthenticated requests
+    if (!this.authenticated) {
+      throw new Error(DiscussionService.TOKEN_REQUIRED);
     }
 
     try {
       const query = `
         query {
           repository(owner: "${this.owner}", name: "${this.repo}") {
-            discussions(first: ${limit}, orderBy: {field: UPDATED_AT, direction: DESC}) {
+            discussions(first: ${DiscussionService.FETCH_COUNT}, orderBy: {field: UPDATED_AT, direction: DESC}) {
               nodes {
                 number
                 title
@@ -99,58 +107,30 @@ export class DiscussionService {
         }))
       }));
 
-      // Cache the results
-      this.cache.set(cacheKey, {
-        data: discussions,
-        timestamp: Date.now()
-      });
-
       return discussions;
     } catch (error) {
       console.error("Error fetching discussions:", error);
+      if ((error as { status?: number }).status === 401) {
+        throw new Error(DiscussionService.TOKEN_REQUIRED);
+      }
       throw new Error(`Failed to fetch AL-Go discussions: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 
   /**
-   * Search discussions by keyword
+   * Rank recent discussions against a query
    */
   async searchDiscussions(searchTerm: string, limit: number = 10): Promise<Discussion[]> {
-    try {
-      const discussions = await this.fetchDiscussions(50);
-
-      const lowerTerm = searchTerm.toLowerCase();
-      return discussions
-        .filter(d =>
-          d.title.toLowerCase().includes(lowerTerm) ||
-          d.body.toLowerCase().includes(lowerTerm) ||
-          d.comments.some(c => c.body.toLowerCase().includes(lowerTerm))
-        )
-        .slice(0, limit);
-    } catch (error) {
-      console.error("Error searching discussions:", error);
-      throw new Error(`Failed to search discussions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    const discussions = await this.fetchDiscussions(DiscussionService.FETCH_COUNT);
+    const index = new Bm25Index<Discussion>();
+    for (const d of discussions) {
+      index.add(d, [
+        { text: d.title, weight: 3 },
+        { text: d.body, weight: 1 },
+        { text: d.comments.map(c => c.body).join(' '), weight: 1 }
+      ]);
     }
-  }
-
-  /**
-   * Get discussions by category
-   */
-  async getDiscussionsByCategory(category: string): Promise<Discussion[]> {
-    try {
-      const discussions = await this.fetchDiscussions(50);
-      return discussions.filter(d => d.category.toLowerCase() === category.toLowerCase());
-    } catch (error) {
-      console.error("Error filtering discussions by category:", error);
-      throw new Error(`Failed to filter discussions: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  }
-
-  /**
-   * Clear discussion cache
-   */
-  clearCache(): void {
-    this.cache.clear();
+    return index.search(searchTerm, limit).map(r => r.item);
   }
 
   /**
