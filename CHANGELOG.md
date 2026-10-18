@@ -13,6 +13,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 
+
+## [2.9.0] - 2026-10-18
+
+### Added
+- Claude Code support: install the 16 AL-Go specialists as Claude Code subagents with `npx al-go-mcp-server --install-agents` (or `--install-agents=claude` / `--install-agents=vscode` for one client)
+- Update check at startup: a one-line notice in chat when a newer version is available (disable with `AL_GO_MCP_UPDATE_CHECK=off`)
+- Installed specialist agents are refreshed automatically when the server is updated
+- Claude Code setup instructions in the README
+
+### Changed
+- Much better search results: documentation, semantic, issue and discussion search now rank results by relevance across all AL-Go markdown documentation
+- `alg-ask` understands normal questions such as "How do I create a release?" and suggests alternative specialists
+- Specialist agent files are only written to your VS Code or Claude Code profile when you opt in with `AL_GO_MCP_INSTALL_AGENTS` or `--install-agents`
+- Documentation is downloaded without using the GitHub API rate limit, and all GitHub data is cached (docs 24h, issues 12h, discussions 6h)
+- `alg-clear-cache` options are now `docs`, `discussion`, `issue` and `all`
+- Requires Node.js 20 or later
+
+### Fixed
+- `alg-search-docs` returned no results until the cache was refreshed manually
+- Search queries with special characters such as `c++` caused an error
+- A log message on stdout could break the connection with strict MCP clients
+- `alg-semantic-search` never returned workshop or scenario results
+- `alg-cache-stats` and `alg-clear-cache` had no effect
+- `alg-get-specialist-knowledge` reported "Specialist not found" until the knowledge graph was built manually
+- Discussion search without a GitHub token showed a misleading rate-limit error
+
 ## [2.8.0] - 2026-06-15
 
 ### Added
