@@ -39,9 +39,14 @@ jobs:
       - name: Run tests (if available)
         run: npm test --if-present
         
-      - name: Security audit
-        run: npm audit --audit-level=moderate
-        
+      # Only fails when this PR introduces a vulnerable dependency.
+      # Pre-existing advisories are caught by the scheduled Security Audit workflow
+      # and fixed by Dependabot security updates, so they don't block unrelated PRs.
+      - name: Dependency review
+        uses: actions/dependency-review-action@v5
+        with:
+          fail-on-severity: moderate
+
       - name: Check for secrets in code
         run: |
           # Check for potential hardcoded secrets (excluding legitimate env var usage)

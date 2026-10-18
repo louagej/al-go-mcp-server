@@ -7,27 +7,21 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "06:00"
-    # Group minor and patch updates together
+    # Group updates so each week yields at most one PR per group
     groups:
       production-dependencies:
-        patterns:
-          - "@modelcontextprotocol/*"
-          - "@octokit/*"
-          - "zod"
-          - "node-fetch"
+        dependency-type: "production"
       development-dependencies:
-        patterns:
-          - "@types/*"
-          - "typescript"
-        update-types:
-          - "minor"
-          - "patch"
+        dependency-type: "development"
+    ignore:
+      # TypeScript 7 (native compiler) is a deliberate migration, not a routine bump
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     # Limit number of open PRs
     open-pull-requests-limit: 5
     # Add labels for easy identification
     labels:
       - "dependencies"
-      - "security"
     # Commit message format
     commit-message:
       prefix: "chore(deps)"
@@ -40,8 +34,11 @@ updates:
       interval: "weekly"
       day: "monday"
       time: "06:00"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
     labels:
       - "github-actions"
-      - "security"
     commit-message:
       prefix: "chore(actions)"
