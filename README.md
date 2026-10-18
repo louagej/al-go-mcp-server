@@ -126,6 +126,17 @@ Or let the server keep them up to date on every start by setting `AL_GO_MCP_INST
 - **Claude Code**: restart the session to load new agents. Claude delegates AL-Go questions to the matching specialist on its own, or you can ask for one: `use alg-rex to find out why my CI/CD workflow fails`. Agents are listed under `/agents`.
 - **VS Code**: the agents appear in the Copilot Chat agent picker as `@alg-*`. They call the server's tools as `al-go-docs/*`, so keep `al-go-docs` as the server name.
 
+### Updates
+
+At startup the server checks npm for a newer version in the background (a single request with a 3-second timeout; it never delays startup or fails offline). When one is available, the next tool result ends with a one-line notice:
+
+- **npx with `@latest`** (the configurations above): restarting the MCP server is enough to get the new version.
+- **Global install**: the notice shows the `npm install -g al-go-mcp-server@latest` command to run.
+
+Agent files installed earlier (see [Specialist Agents](#specialist-agents-optional)) are rewritten automatically when the server version changes, followed by a notice to restart the Claude Code session or reload the VS Code window. Only clients that already have AL-Go agents are touched, and only the `alg-*` files.
+
+Set `AL_GO_MCP_UPDATE_CHECK` to `off` to disable the update check. The server uses `npm_config_registry` when it is set, so a company npm mirror works.
+
 ### Command Line (Advanced)
 
 ```bash
